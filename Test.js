@@ -1,0 +1,23 @@
+const ProductManager = require("./ProductManager");
+
+const manager = new ProductManager();
+console.log("--------Get All Products: --------");
+const testArray = manager.getProducts();
+console.log(testArray);
+console.log("--------Get by ID: --------");
+manager.getProductById(1);
+console.log("--------Add Product: --------");
+manager.addProduct("producto prueba 1", "Este es un producto prueba 1",200,"Sin imagen","abc123",25);
+manager.addProduct("producto prueba 2", "Este es un producto prueba 2",200,"Sin imagen","abc234",25);
+manager.addProduct("producto prueba 3", "Este es un producto prueba 3",200,"Sin imagen","abc345",25);
+console.log("--------Get All Products / Validar autoincremental: --------");
+console.log(manager.getProducts());
+console.log("--------Get by ID: --------");
+console.log(manager.getProductById(1));
+console.log(manager.getProductById(3));
+console.log("--------Validar que no se puedan repetir códigos --------");
+manager.addProduct("producto prueba 1", "Este es un producto prueba 1",200,"Sin imagen","abc123",25);
+manager.addProduct("producto prueba 2", "Este es un producto prueba 2",200,"Sin imagen","abc234",25);
+manager.addProduct("producto prueba 3", "Este es un producto prueba 3",200,"Sin imagen","abc345",25);
+console.log("--------Validar error cuando se llama un ID que no existe: --------");
+console.log(manager.getProductById(5));
