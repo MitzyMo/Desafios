@@ -67,7 +67,7 @@ class ProductManager {
             JSON.stringify(existingProducts, null, 5)
         );
         } catch (error) {
-        console.error("Error writing products to file:", error);
+        console.error("Unable to write products into file:", error);
         }
 
         return products;
@@ -82,7 +82,7 @@ class ProductManager {
         if (product) {
         return product;
         } else {
-        return `Product with id: ${id} was not found.`;
+        return `Product with id: "${id}" not found.`;
         }
     }
 
@@ -103,12 +103,12 @@ class ProductManager {
             this.path,
             JSON.stringify(products, null, 5)
             );
-            return `El producto con id "${id} se ha actualizado`;
+            return `Product with id "${id}" has been updated`;
         } catch (error) {
             console.log(`Failed to update product: ${error}`);
         }
         } else {
-        console.log(`No product found with ID "${id}"`);
+        console.log(`Product with id "${id}" not found`);
         }
     }
 
@@ -124,12 +124,12 @@ class ProductManager {
             // Eliminar el producto con el id dado por parametro
             products = products.filter((product) => product.id !== id);
             filePromise.writeFile(this.path, JSON.stringify(products));
-            return `El producto con id "${id} se ha eliminado`;
+            return `Product with id "${id}" has been deleted`;
         } catch (error) {
-            console.log(`Error al eliminar el producto: ${error}`);
+            console.log(`Unable to delete product: ${error}`);
         }
         } else {
-        return `No se ha encontrado el producto con id "${id}"`;
+        return `Product with id "${id}" not found`; 
         }
     }                 
 }
