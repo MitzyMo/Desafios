@@ -1,38 +1,44 @@
-import express from "express"
-import {router as ProductManager} from "./routes/productsRouter.js"
-import {router as CartManager} from "./routes/cartsRouter.js"
+//const path = require("path");
+const express = require("express");
+//const ProductManager = require("./dao/ProductManager");
+//let filePath = path.join(__dirname,'..','src', "data", "products.json");
+const {router:ProductManager } = require("./routes/productsRouter");
+//import {router as CartManager} from "./routes/cartsRouter.js"
 //declarar el puerto
 const PORT = 3000;
 //inicializar en app con express
 const app = express();
 
+
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use("/api/products", ProductManager)
-app.use("/api/cart", CartManager)
+//app.use("/api/cart", CartManager)
 
-app.get('/',(request,response)=>{
-    res.setHeader('Content-Type','text/plain');
-    res.status(200).send('OK');
-})
-
+app.get('/',(request,response)=>{   
+    response.json("Landing Page");
+    response.setHeader('Content-Type','application/json')
+    response.status(200).json({Status: "Ok"})})
 
 //escuchar el servidor de acuerdo al puerto elegido
-app.listen(PORT, () => console.log(`Server connnected in port ${PORT}`));
+app.listen(PORT, error => {
+    if (error) {
+        console.error('Failed to start the server:', error);
+        return;
+    }
+    console.log(`Server connected in port ${PORT}`);
+});
 
 
 
 /* 
-Previous App
-import path from "path";
-import ProductManager from "../dao/ProductManager"
-let filePath = path.join(__dirname,'..','src', "data", "products.json");
 //Traer clase manager
 const manager = new ProductManager(filePath);
 //Define urls
-app.get("/", (request, response) => {
-    response.send("Landing Page");
-});
+app.get('/',(request,response)=>{   
+    response.json("Landing Page");
+    response.setHeader('Content-Type','application/json')
+    response.status(200).json({Status: "Ok"})})
 //Devuelve todos los productos.
 app.get("/products", async(request, response) => {
     let data = await manager.getProducts();

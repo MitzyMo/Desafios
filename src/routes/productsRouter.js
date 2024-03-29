@@ -1,34 +1,11 @@
-import path from "path";
-import ProductManager from "../dao/ProductManager"
-import { Router } from 'express';
-export const router=Router()
-
+const path = require("path");
+const ProductManager = require("../src/dao/ProductManager");
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
+import express from 'express';
+export const router = express.Router();
 
 const manager = new ProductManager(filePath);
 
-router.get('/',(request,response)=>{   
-    response.json("Landing Page");
-    response.setHeader('Content-Type','application/json')
-    response.status(200).json({})
-})
-
-router.get("/", async(req, res)=>{
-
-    // let limit=req.query.limit
-
-    let {limit, skip, nombre}=req.query
-
-    console.log(skip, nombre)
-
-    let usuarios=await userManager.leerUsuarios()
-    if(limit){
-        usuarios=usuarios.slice(0, limit)
-    }
-
-    res.json(usuarios)
-
-})
 //Devuelve todos los productos.
 router.get("/", async(request, response) => {
     let data = await manager.getProducts();
@@ -54,9 +31,25 @@ router.get("/:pid", async (request, response) => {
     }
 });
 //Additional Methods
+
+/* The root path POST / should add a new product with the fields:
+- id: Number/String (Your choice, the id is NOT sent from body, it is auto generated as we have seen from the first deliverables, ensuring that you will NEVER repeat ids in the file.
+- title:String,
+- description:String
+- code:String
+- price:Number
+- status:Boolean*
+- stock:Number
+- category:String
+- thumbnails: Array of Strings containing the paths where the images referring to that product are stored.
+*Status is true by default.
+*All fields are required, except for thumbnails.
+
+Translated with DeepL.com (free version)
+*/
 router.post('',async (request,response)=>{
-   const product=await manager.addProduct(request.body);
-   response.status(201).json(product);
+const product=await manager.addProduct(request.body);
+response.status(201).json(product);
 })
 
 router.put('/:id',async (request,response)=>{
@@ -68,3 +61,5 @@ router.delete('/:id',async (request,response)=>{
     const dproduct=await manager.deleteProduct(request.params.id)
     response.json(dproduct)
 })
+
+

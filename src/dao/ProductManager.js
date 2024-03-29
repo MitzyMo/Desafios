@@ -1,83 +1,120 @@
 const { promises: filePromise } = require("fs");
-//Realizar una clase "ProductManager" que gestione un conjunto de productos.
+
+//1 . Build a "ProductManager" class that manages a set of products.
 class ProductManager {
     static idCounter = 0;
-
-    //Debe crearse desde su constructor con el elemento products, el cual será un arreglo vacío.
+    //2. It must be created from its constructor with the products element, which will be an empty array.
     constructor(filePath) {
         this.path = filePath;
     }
-    /*
-    Debe contar con un método "getProducts" el cual debe devolver el arreglo con todos los productos creados hasta ese momento
-    */
+    //3. It must have a method "getProducts" which must return the array with all the products created up to that moment.
     async getProducts() {
         try {
-        return JSON.parse(
-            await filePromise.readFile(this.path, { encoding: "utf8" })
-        );
+        const data = await filePromise.readFile(this.path, { encoding: "utf8" });
+        return JSON.parse(data);
         } catch (error) {
-        if (error.code === "ENOENT") {//Si js arroja el error "Error NO ENTry" then we retunr an empty object.
+        if (error.code === "ENOENT") {
+            // If the file does not exist, return an empty array
             return [];
         } else {
+            // Log any other errors
+            console.error("Error reading products:", error);
             throw error;
         }
         }
     }
-
-    /* 
-    Cada producto que gestione debe contar con las propiedades:
-    -title (nombre del producto)
-    -description (descripción del producto)
-    -price (precio)
-    -thumbnail (ruta de imagen)
-    -code (código identificador)
-    -stock (número de piezas disponibles)
-
-    Debe contar con un método "addProduct" el cual agregará un producto al arreglo de productos inicial.
-    - Validar que no se repita el campo "code" y que todos los campos sean obligatorios. Al agregarlo, debe crearse con un id autoincrementable 
-    */
-   //title , description, code, price, status, stock, category, SON OBLIGATORIOS. 
-   //thumbnails, discaountPercentage, rating, brand, images. NOT mandatory.
-    async addProduct(title, description, price, thumbnail, code, stock) {
-        let products = await this.getProducts();
-        // Validar que todos los campos sean obligatorios
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
+    //4. You must have an "addProduct" method which will add a product to the initial product array.
+    /*         
+            - Validate that the "code" field is not repeated and that all fields are mandatory. When adding it, it must be created with an auto-incrementable id. 
+            Each product it manages must have the following properties:
+            - id: Number/String (Your choice, the id is NOT sent from body, it is auto generated as we have seen from the first deliverables, ensuring that you will NEVER repeat ids in the file)
+            - title:String,
+            - description:String
+            - code:String (This can not be repeated).
+            - price:Number
+            - discountPercentage
+            - rating
+            - brand
+            - status:Boolean*
+            - stock:Number
+            - category:String
+            - thumbnails: Array of Strings containing the paths where the images referring to that product are stored.
+                *. title, description, code, price, status, stock, category, ARE REQUIRED. 
+                *. thumbnails, discountPercentage, rating, brand, images. NOT mandatory.
+            */
+    async addProduct(
+        title,
+        description,
+        code,
+        price,
+        discountPercentage,
+        rating,
+        status,
+        stock,
+        brand,
+        category,
+        thumbnails = [],
+        images = []
+    ) {
+        // Validate mandatory fields
+        if (
+        !title ||
+        !description ||
+        !code ||
+        !price ||
+        !status ||
+        !stock ||
+        !category
+        ) {
         throw new Error("All fields are mandatory");
         }
-        // Validar que no se repita el campo "code"
+
+        let products = await this.getProducts();
+
+        // Validate the uniqueness of the "code" and "id" fields
         if (products.some((product) => product.code === code)) {
         throw new Error("The product code already exists.");
         }
-        // Creating a new product with autoincrement requested
+        // Find the maximum ID in existing products and increment by 1
+        const maxId = products.reduce(
+        (max, product) => Math.max(max, product.id),
+        0
+        );
+        const newId = maxId + 1;
+        // Creating a new product with auto-incrementable id
         const newProduct = {
-        id: ++ProductManager.idCounter,
+        id: newId,
         title,
         description,
-        price,
-        thumbnail,
         code,
+        price,
+        discountPercentage,
+        rating,
+        brand,
+        status,
         stock,
+        category,
+        thumbnails,
+        images,
         };
-        //Validate if I already entered a product, and then push the new one to array
-        let existingProducts = await this.getProducts();
-        // Add new product
-        existingProducts.push(newProduct);
+
+        // Add the new product to the existing products array
+        products.push(newProduct);
+
         try {
         // Write the updated array back to the file
-        await filePromise.writeFile(
-            this.path,
-            JSON.stringify(existingProducts, null, 5)
-        );
+        await filePromise.writeFile(this.path, JSON.stringify(products, null, 5));
         } catch (error) {
         console.error("Unable to write products into file:", error);
+        throw error; // Propagate the error
         }
 
-        return products;
+        return newProduct; // Return the newly added product
     }
-    /*
-    Debe contar con un método "getProductByld" el cual debe buscar en el arreglo el producto que coincida con el id
-    ーEn caso de no coincidir ningún id, mostrar en consola un error "Not found"
-    */
+
+    /* 5. It must have a method "getProductByld" which must search the array for the product that matches the id.
+        ーIn case no id is matched, display a "Not found" error in console.
+        */
     async getProductById(id) {
         let products = await this.getProducts();
         const product = products.find((product) => product.id === id);
@@ -87,12 +124,10 @@ class ProductManager {
         return `Product with id: "${id}" not found.`;
         }
     }
-
     /*
-    Debe tener un método updateProduct, el cual debe recibir el id del producto a actualizar, así también como el campo a actualizar (puede ser el objeto completo, como en una DB), y debe actualizar el producto que tenga ese id en el archivo.
-    NO DEBE BORRARSE SU ID
-    */
-
+            6. It must have an updateProduct method, which must receive the id of the product to update, as well as the field to  update (it can be the whole object, as in a DB), and must update the product that has that id in the file.
+                ITS ID MUST NOT BE DELETED
+                */
     async updateProduct(id, updatedFields) {
         let products = await this.getProducts();
         const product = products.findIndex((product) => product.id === id);
@@ -113,17 +148,15 @@ class ProductManager {
         console.log(`Product with id "${id}" not found`);
         }
     }
-
     /*
-    Debe tener un método deleteProduct, el cual debe recibir un id y debe eliminar el producto que tenga ese id en el archivo.
-    */
-
+            7. It must have a deleteProduct method, which must receive an id and must delete the product that has that id in the file.
+                */
     async deleteProduct(id) {
         let products = await this.getProducts();
         const product = products.find((product) => product.id === id);
         if (product) {
         try {
-            // Eliminar el producto con el id dado por parametro
+            // Delete the product with the id given by parameter
             products = products.filter((product) => product.id !== id);
             filePromise.writeFile(this.path, JSON.stringify(products));
             return `Product with id "${id}" has been deleted`;
@@ -131,9 +164,75 @@ class ProductManager {
             console.log(`Unable to delete product: ${error}`);
         }
         } else {
-        return `Product with id "${id}" not found`; 
+        return `Product with id "${id}" not found`;
         }
-    }                 
+    }
 }
 
 module.exports = ProductManager;
+
+/* 
+//-------------------------------- TESTING --------------------------------
+    console.log(process.cwd());
+    const manager = new ProductManager("./src/data/products.json");
+//Get all products: 
+try {
+    const products = await manager.getProducts();
+    console.log(products);
+    } catch (error) {
+    console.error("Error:", error);
+}
+//Adding a new product
+const title = "New Product";
+const description = "Description of the new product";
+const code = "ABC123"; // Unique product code
+const price = 19.99;
+const discountPercentage = 10;
+const rating = 4.5;
+const brand = "Brand Name";
+const status = true;
+const stock = 100;
+const category = "Category Name";
+const thumbnails = ["path/to/thumbnail1.jpg", "path/to/thumbnail2.jpg"];
+const images = ["path/to/image1.jpg", "path/to/image2.jpg"];
+
+// Call the addProduct method to add the new product
+try {
+    const newProduct = await manager.addProduct(title, description, code, price, discountPercentage, rating, status, stock, brand, category, thumbnails, images);
+    console.log("New product added successfully:", newProduct);
+} catch (error) {
+    console.error("Error adding product:", error);
+}  
+//Get products by ID: 
+try {
+    const products = await manager.getProductById(31);
+    console.log(products);
+    } catch (error) {
+    console.error("Error:", error);
+} 
+// Define the updated fields
+const updatedFields = {
+    price: 29.99, // New price
+    stock: 50 // New stock
+};
+// Call the updateProduct method to update the product
+try {
+    const updateResult = await manager.updateProduct(31, updatedFields);
+    console.log(updateResult);
+} catch (error) {
+    console.error("Error updating product:", error);
+}
+//Get products by ID: 
+try {
+    const products = await manager.getProductById(100);
+    console.log(products);
+    } catch (error) {
+    console.error("Error:", error);
+} 
+//Delete products by ID
+try {
+    const products = await manager.deleteProduct(31);
+    console.log(products);
+    } catch (error) {
+    console.error("Error:", error);
+}*/

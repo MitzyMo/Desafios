@@ -1,98 +1,110 @@
-//----------------Declaring Test Data----------------//
 const path = require("path");
 const ProductManager = require("../src/dao/ProductManager");
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
-const manager = new ProductManager(filePath);
-
 //----------------Initiate Test----------------//
+const manager = new ProductManager(filePath);
+// Get all products
 const testGetProducts = async () => {
     try {
-        console.log(await manager.getProducts());
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-const testGetProductsById = async (id) => {
-    try {
-        console.log(await manager.getProductById(id));
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-const testAddingProducts = async () => { 
-    try {
-        await manager.addProduct("producto prueba 1","Este es un producto prueba 1",200,"Sin imagen","abc123",25);
-        await manager.addProduct("producto prueba 2","Este es un producto prueba 2",200,"Sin imagen","abc234",25);
-        await manager.addProduct("producto prueba 3","Este es un producto prueba 3",200,"Sin imagen","abc345",25);
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-const testUpdateProductById = async (id, updatedFields) => {
-    try {
-        console.log(await manager.updateProduct(id, updatedFields));
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-const testDeleteProductsById = async (id) => {
-    try {
-        console.log(await manager.deleteProduct(id));
-    } catch (error) {
-        console.log(error.message);
+        const products = await manager.getProducts();
+        console.log(products);
+        } catch (error) {
+        console.error("Error:", error);
     }
 };
 
+// Adding a new product
+const testAddingProduct = async () => {
+    const title = "New Product";
+    const description = "Description of the new product";
+    const code = "ABC123"; // Unique product code
+    const price = 19.99;
+    const discountPercentage = 10;
+    const rating = 4.5;
+    const brand = "Brand Name";
+    const status = true;
+    const stock = 100;
+    const category = "Category Name";
+    const thumbnails = ["path/to/thumbnail1.jpg", "path/to/thumbnail2.jpg"];
+    const images = ["path/to/image1.jpg", "path/to/image2.jpg"];
+
+    try {
+        const newProduct = await manager.addProduct(title, description, code, price, discountPercentage, rating, status, stock, brand, category, thumbnails, images);
+        console.log("New product added successfully:", newProduct);
+    } catch (error) {
+        console.error("Error adding product:", error);
+    }
+};
+
+// Get products by ID
+const testGetProductById = async (id) => {
+    try {
+        const product = await manager.getProductById(id);
+        console.log(product);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
+// Update product by ID
+const testUpdateProductById = async (id, updatedFields) => {
+    try {
+        const updateResult = await manager.updateProduct(id, updatedFields);
+        console.log(updateResult);
+    } catch (error) {
+        console.error("Error updating product:", error);
+    }
+};
+
+// Delete product by ID
+const testDeleteProductById = async (id) => {
+    try {
+        const deleteResult = await manager.deleteProduct(id);
+        console.log(deleteResult);
+    } catch (error) {
+        console.error("Error deleting product:", error);
+    }
+};
 
 //----------------Calling All Tests----------------//
 
-//----------------Initiate Test----------------//
 const testAll = async () => {
     try {
-        // Get all products before adding to the list
-        console.log("----Get all products before adding to the list----");
+        // Get all products before adding a new one
+        console.log("----Get all products before adding a new one----");
         await testGetProducts();
 
-        // Get products by ID before adding to the list
-        console.log("----Get products by ID before adding to the list----");
-        await testGetProductsById(1);
+        // Add a new product
+        console.log("----Adding a new product----");
+        await testAddingProduct();
 
-        // Add products
-        console.log("----Adding products----");
-        await testAddingProducts();
-
-        // Get all products after being added / Validate autoincremental
-        console.log("----Get all products after being added / Validate autoincremental----");
+        // Get all products after adding the new one
+        console.log("----Get all products after adding the new one----");
         await testGetProducts();
 
-        // Get products by ID after being added
-        console.log("----Get products by ID after being added----");
-        await testGetProductsById(1);
+        // Get products by ID after adding the new one
+        console.log("----Get products by ID after adding the new one----");
+        await testGetProductById(31);
 
-        console.log("--------Validating that product codes cannot be repeated --------");
-        await testAddingProducts();
+        // Update the newly added product
+        console.log("----Update the newly added product----");
+        await testUpdateProductById(31, { price: 29.99, stock: 50 });
 
-        console.log("--------Validating error when calling an ID that does not exist: --------");
-        await testDeleteProductsById(5);
+        // Get products by ID after updating
+        console.log("----Get products by ID after updating----");
+        await testGetProductById(31);
 
-        // Delete Product by ID
-        console.log("----Delete Product by ID----");
-        await testDeleteProductsById(2);
+        // Delete the newly added product
+        console.log("----Delete the newly added product----");
+        await testDeleteProductById(31);
 
-        // Get all products after deleting one
-        console.log("----Get all products after deleting one----");
-        await testGetProducts();
-
-        // Update a product
-        console.log("----Update a product----");
-        await testUpdateProductById(1, { price: 20, stock: 100 });
-
-        console.log("--------Validating that the product is updated: --------");
-        await testGetProductsById(1);
+        // Get all products after deleting the new one
+        console.log("----Get all products after deleting the new one----");
+        await testGetProducts(); 
 
     } catch (error) {
-        console.log(error.message);
+        console.error("Error:", error);
     }
 };
-
+console.log(process.cwd());
 testAll();
