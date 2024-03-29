@@ -36,6 +36,8 @@ class ProductManager {
     Debe contar con un método "addProduct" el cual agregará un producto al arreglo de productos inicial.
     - Validar que no se repita el campo "code" y que todos los campos sean obligatorios. Al agregarlo, debe crearse con un id autoincrementable 
     */
+   //title , description, code, price, status, stock, category, SON OBLIGATORIOS. 
+   //thumbnails, discaountPercentage, rating, brand, images. NOT mandatory.
     async addProduct(title, description, price, thumbnail, code, stock) {
         let products = await this.getProducts();
         // Validar que todos los campos sean obligatorios

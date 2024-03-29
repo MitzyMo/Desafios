@@ -1,6 +1,6 @@
 //----------------Declaring Test Data----------------//
 const path = require("path");
-const ProductManager = require("../src/classes/ProductManager");
+const ProductManager = require("../src/dao/ProductManager");
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
 const manager = new ProductManager(filePath);
 
