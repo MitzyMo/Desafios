@@ -11,6 +11,7 @@ class ProductManager {
     async getProducts() {
         try {
         const data = await filePromise.readFile(this.path, { encoding: "utf8" });
+        console.log("Products data read from file:", data);
         return JSON.parse(data);
         } catch (error) {
         if (error.code === "ENOENT") {
@@ -23,6 +24,7 @@ class ProductManager {
         }
         }
     }
+
     //4. You must have an "addProduct" method which will add a product to the initial product array.
     /*         
             - Validate that the "code" field is not repeated and that all fields are mandatory. When adding it, it must be created with an auto-incrementable id. 
