@@ -1,10 +1,20 @@
-import path from "path";
-import { Router } from 'express';
-export const router=Router()
-router.get('/',(request,response)=>{
+const express = require("express");
+const router = express.Router();
+const CartManager = require("../dao/CartManager");
 
-    
+const cartManager = new CartManager();
 
-    response.setHeader('Content-Type','application/json')
-    response.status(200).json({})
-})
+// Route to list products in a cart
+router.get("/:cid", (req, res) => {
+});
+
+// Route to create a new cart
+router.post("/", (req, res) => {
+});
+
+// Route to add a product to a cart
+router.post("/:cid/product/:pid", (req, res) => {
+
+});
+
+module.exports = router;
