@@ -58,7 +58,6 @@ router.get("/", async (request, response) => {
     }
     });
     //Update Product
-
     router.put("/:pid", async (request, response) => {
     let pid = request.params.pid;
     pid = Number(pid);
@@ -74,7 +73,6 @@ router.get("/", async (request, response) => {
         }
     }
     });
-
     router.delete("/:pid", async (request, response) => {
     let pid = request.params.pid;
     pid = Number(pid);

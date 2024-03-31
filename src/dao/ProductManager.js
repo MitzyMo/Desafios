@@ -2,7 +2,6 @@ const { promises: filePromise } = require("fs");
 
 //1 . Build a "ProductManager" class that manages a set of products.
 class ProductManager {
-    static idCounter = 0;
     //2. It must be created from its constructor with the products element, which will be an empty array.
     constructor(filePath) {
         this.path = filePath;
@@ -27,23 +26,23 @@ class ProductManager {
 
     //4. You must have an "addProduct" method which will add a product to the initial product array.
     /*         
-            - Validate that the "code" field is not repeated and that all fields are mandatory. When adding it, it must be created with an auto-incrementable id. 
-            Each product it manages must have the following properties:
-            - id: Number/String (Your choice, the id is NOT sent from body, it is auto generated as we have seen from the first deliverables, ensuring that you will NEVER repeat ids in the file)
-            - title:String,
-            - description:String
-            - code:String (This can not be repeated).
-            - price:Number
-            - discountPercentage
-            - rating
-            - brand
-            - status:Boolean*
-            - stock:Number
-            - category:String
-            - thumbnails: Array of Strings containing the paths where the images referring to that product are stored.
-                *. title, description, code, price, status, stock, category, ARE REQUIRED. 
-                *. thumbnails, discountPercentage, rating, brand, images. NOT mandatory.
-            */
+                - Validate that the "code" field is not repeated and that all fields are mandatory. When adding it, it must be created with an auto-incrementable id. 
+                Each product it manages must have the following properties:
+                - id: Number/String (Your choice, the id is NOT sent from body, it is auto generated as we have seen from the first deliverables, ensuring that you will NEVER repeat ids in the file)
+                - title:String,
+                - description:String
+                - code:String (This can not be repeated).
+                - price:Number
+                - discountPercentage
+                - rating
+                - brand
+                - status:Boolean*
+                - stock:Number
+                - category:String
+                - thumbnails: Array of Strings containing the paths where the images referring to that product are stored.
+                    *. title, description, code, price, status, stock, category, ARE REQUIRED. 
+                    *. thumbnails, discountPercentage, rating, brand, images. NOT mandatory.
+                */
     async addProduct(
         title,
         description,
@@ -70,19 +69,13 @@ class ProductManager {
         ) {
         throw new Error("All fields are mandatory");
         }
-
         let products = await this.getProducts();
-
         // Validate the uniqueness of the "code" and "id" fields
         if (products.some((product) => product.code === code)) {
         throw new Error("The product code already exists.");
         }
         // Find the maximum ID in existing products and increment by 1
-        const maxId = products.reduce(
-        (max, product) => Math.max(max, product.id),
-        0
-        );
-        const newId = maxId + 1;
+        const newId = await this.generateNewId();
         // Creating a new product with auto-incrementable id
         const newProduct = {
         id: newId,
@@ -99,24 +92,20 @@ class ProductManager {
         thumbnails,
         images,
         };
-
         // Add the new product to the existing products array
         products.push(newProduct);
-
-        try {
         // Write the updated array back to the file
-        await filePromise.writeFile(this.path, JSON.stringify(products, null, 5));
+        try {
+        await this.writeToFile(products);
         } catch (error) {
         console.error("Unable to write products into file:", error);
         throw error; // Propagate the error
         }
-
         return newProduct; // Return the newly added product
     }
-
     /* 5. It must have a method "getProductByld" which must search the array for the product that matches the id.
         ーIn case no id is matched, display a "Not found" error in console.
-        */
+            */
     async getProductById(id) {
         let products = await this.getProducts();
         const product = products.find((product) => product.id === id);
@@ -127,9 +116,9 @@ class ProductManager {
         }
     }
     /*
-            6. It must have an updateProduct method, which must receive the id of the product to update, as well as the field to  update (it can be the whole object, as in a DB), and must update the product that has that id in the file.
-                ITS ID MUST NOT BE DELETED
-                */
+                6. It must have an updateProduct method, which must receive the id of the product to update, as well as the field to  update (it can be the whole object, as in a DB), and must update the product that has that id in the file.
+                    ITS ID MUST NOT BE DELETED
+                    */
     async updateProduct(id, updatedFields) {
         let products = await this.getProducts();
         const product = products.findIndex((product) => product.id === id);
@@ -138,21 +127,18 @@ class ProductManager {
             // Update product with the provided fields
             products[product] = { ...products[product], ...updatedFields };
             // Write the updated array back to the file
-            await filePromise.writeFile(
-            this.path,
-            JSON.stringify(products, null, 5)
-            );
-            return `Product with id "${id}" has been updated`;
+            await this.writeToFile(products);
         } catch (error) {
-            console.log(`Failed to update product: ${error}`);
+            console.error("Unable to write products into file:", error);
+            throw error; // Propagate the error
         }
         } else {
         console.log(`Product with id "${id}" not found`);
         }
     }
     /*
-            7. It must have a deleteProduct method, which must receive an id and must delete the product that has that id in the file.
-                */
+                7. It must have a deleteProduct method, which must receive an id and must delete the product that has that id in the file.
+                    */
     async deleteProduct(id) {
         let products = await this.getProducts();
         const product = products.find((product) => product.id === id);
@@ -160,13 +146,27 @@ class ProductManager {
         try {
             // Delete the product with the id given by parameter
             products = products.filter((product) => product.id !== id);
-            filePromise.writeFile(this.path, JSON.stringify(products));
-            return `Product with id "${id}" has been deleted`;
+            this.writeToFile(products);
         } catch (error) {
-            console.log(`Unable to delete product: ${error}`);
+            console.error("Unable to write products into file:", error);
+            throw error; // Propagate the error
         }
         } else {
         return `Product with id "${id}" not found`;
+        }
+    }
+    async generateNewId() {
+        let products = await this.getProducts();
+        const maxId = products.reduce((max, product) => Math.max(max, product.id), 0);
+        return maxId + 1;
+    }
+    async writeToFile(products) {
+        try {
+        // Write the updated array back to the file
+        await filePromise.writeFile(this.path, JSON.stringify(products, null, 5));
+        } catch (error) {
+        console.error("Unable to write products into file:", error);
+        throw error; // Propagate the error
         }
     }
 }
