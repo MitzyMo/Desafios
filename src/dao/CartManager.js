@@ -6,8 +6,7 @@ class CartManager {
     constructor() {
         this.filePath = path.join(__dirname, "..", "data", "carts.json");
         this.carts = [];
-    }
-    
+    }   
     async loadCartData() {
         try {
         const data = await filePromise.readFile(this.filePath, {
@@ -36,7 +35,6 @@ class CartManager {
         return `cart with id: "${id}" not found.`;
         }
     }
-
     async createCart() {
         await this.loadCartData();
         // Find the maximum ID in existing carts and increment by 1
@@ -84,15 +82,13 @@ class CartManager {
             }
             // Write the updated carts data back to the file
             await this.writeToFile(this.carts);
-    
             // Return the updated cart
             return this.carts[cartIndex];
         } else {
             // If the cart does not exist, throw an error
             throw new Error(`Cart with id ${cid} does not exist.`);
         }
-    }
-    
+    }   
     //write data to json file
     async writeToFile(carts) {
         try {
