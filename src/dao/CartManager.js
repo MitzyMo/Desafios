@@ -32,7 +32,7 @@ class CartManager {
         if (cart) {
         return cart;
         } else {
-        return `cart with id: "${id}" not found.`;
+        throw new Error(`cart with id: "${id}" not found.`);
         }
     }
     async createCart() {

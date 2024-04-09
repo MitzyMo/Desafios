@@ -112,7 +112,7 @@ class ProductManager {
         if (product) {
         return product;
         } else {
-        return `Product with id: "${id}" not found.`;
+            throw new Error(`Product with id: "${id}" not found.`);
         }
     }
     /*
@@ -133,7 +133,7 @@ class ProductManager {
             throw error; // Propagate the error
         }
         } else {
-        console.log(`Product with id "${id}" not found`);
+        throw new Error(`Product with id "${id}" not found`);
         }
     }
     /*
@@ -152,7 +152,7 @@ class ProductManager {
             throw error; // Propagate the error
         }
         } else {
-        return `Product with id "${id}" not found`;
+        throw new Error(`Product with id "${id}" not found`);
         }
     }
     async generateNewId() {
