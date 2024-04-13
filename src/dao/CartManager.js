@@ -1,10 +1,15 @@
-const { promises: filePromise } = require("fs");
-const path = require("path");
-const ProductManager = require("../dao/ProductManager");
+//const { promises: filePromise } = require("fs");
+//const path = require("path");
+//import path from 'path';
+//const ProductManager = require("../dao/ProductManager");
+import { promises as filePromise } from 'fs';
+import ProductManagerModule from '../dao/ProductManager.js';
+const { ProductManager } = ProductManagerModule;
+let filePath = new URL('../src/data/products.json', import.meta.url);
 
 class CartManager {
     constructor() {
-        this.filePath = path.join(__dirname, "..", "data", "carts.json");
+        this.filePath = new URL('../data/carts.json', import.meta.url);
         this.carts = [];
     }   
     async loadCartData() {
@@ -55,7 +60,7 @@ class CartManager {
     }
     // Add a product into the cart
     async addProductToCart(cid, pid) {
-        const manager = new ProductManager("../data/products.json");
+        const manager = new ProductManager(filePath);
         // Load carts data
         await this.loadCartData();
         // Find the index of the cart with the given id
@@ -104,4 +109,5 @@ class CartManager {
     }
 }
 
-module.exports = CartManager;
+//module.exports = CartManager;
+export default {CartManager};

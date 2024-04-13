@@ -1,8 +1,11 @@
-const express = require("express");
+//const express = require("express");
+//const path = require("path");
+//const ProductManager = require("../dao/ProductManager");
+import express from 'express';
+import ProductManagerModule from '../dao/ProductManager.js';
+const { ProductManager } = ProductManagerModule;
 const router = express.Router();
-const path = require("path");
-const ProductManager = require("../dao/ProductManager");
-let filePath = path.join(__dirname, "..", "data", "products.json");
+let filePath = new URL('../data/products.json', import.meta.url);
 const manager = new ProductManager(filePath);
 
 router.get("/", async (request, response) => {
@@ -88,4 +91,5 @@ router.get("/", async (request, response) => {
     }
 });
 
-module.exports = router;
+//module.exports = router;
+export default router;
