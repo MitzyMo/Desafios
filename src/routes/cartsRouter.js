@@ -1,6 +1,9 @@
-const express = require("express");
+//const express = require("express");
+//const CartManager = require("../dao/CartManager");
+import express from "express";
+import cartManagerModule from '../dao/CartManager.js';
+const { CartManager } = cartManagerModule;
 const router = express.Router();
-const CartManager = require("../dao/CartManager");
 const manager = new CartManager();
 
 // Route to list products in a cart
@@ -35,4 +38,5 @@ router.post("/:cid/product/:pid", async(request, response) => {
     }
 });
 
-module.exports = router;
+//module.exports = router;
+export default router;

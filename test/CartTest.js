@@ -1,4 +1,6 @@
-const CartManager = require('../src/dao/CartManager');
+//const CartManager = require('../src/dao/CartManager');
+import cartManagerModule from '../src/dao/CartManager.js';
+const { CartManager } = cartManagerModule;
 
 async function testCartManager() {
     const cartManager = new CartManager();
@@ -48,5 +50,5 @@ async function testCartManager() {
         console.error("Error Loading Cart Data:", error);
     }
 }
-
+console.log(process.cwd());
 testCartManager();
