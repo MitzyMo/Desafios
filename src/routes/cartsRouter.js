@@ -1,5 +1,3 @@
-//const express = require("express");
-//const CartManager = require("../dao/CartManager");
 import express from "express";
 import cartManagerModule from '../dao/CartManager.js';
 const { CartManager } = cartManagerModule;
