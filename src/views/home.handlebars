@@ -1,4 +1,31 @@
-<h1>TESTING HANDLEBARS PRODUCTS</h1>
-<hr>
-<br>
-<a href="/realtimeproducts">Products</a>
+
+<h1>Products List:</h1>
+
+{{!-- https://developer.mozilla.org/en-US/docs/Glossary/Falsy --}}
+
+  {{#each data}}
+  <li>
+    <h3>{{title}}</h3>
+    <dl>
+      <dt>Quantity:</dt>
+      <dd>{{stock}}</dd>
+      <dt>Price:</dt>
+      <dd>
+        ${{price}}
+        {{#if status}}
+        <strong>Order now!</strong>
+        {{/if}}
+      </dd>
+    </dl>
+  </li>
+  {{/each}}
+
+
+
+
+
+<br><br>
+<a href="/">Home</a>
+
+
+<a href="/realtimeproducts">Real TimeProducts</a>
