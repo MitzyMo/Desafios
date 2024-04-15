@@ -1,14 +1,11 @@
-//const path = require("path");
-//const ProductManager = require("../src/dao/ProductManager");
-
-//import path from 'path';
+import path from 'path'; // Import path module
+import __dirname from "../src/utils.js"; // Import __dirname from utils.js
 import ProductManagerModule from '../src/dao/ProductManager.js';
 const { ProductManager } = ProductManagerModule;
-//let filePath = path.join(__dirname,'..','src', "data", "products.json");
-let filePath = new URL('../src/data/products.json', import.meta.url);
+let filePath = path.join(__dirname,'..','src', "data", "products.json");
 //console.log(filePath);
 //----------------Initiate Test----------------//
-console.log(process.cwd());
+//console.log(process.cwd());
 const manager = new ProductManager(filePath);
 // Get all products
 const testGetProducts = async () => {
@@ -115,3 +112,4 @@ const testAll = async () => {
 };
 console.log(process.cwd());
 testAll();
+console.log(filePath);

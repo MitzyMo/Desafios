@@ -1,20 +1,19 @@
-//const { promises: filePromise } = require("fs");
-//const path = require("path");
-//import path from 'path';
-//const ProductManager = require("../dao/ProductManager");
+import path from 'path'; // Import path module
+import __dirname from "../utils.js"; // Import __dirname from utils.js
 import { promises as filePromise } from 'fs';
 import ProductManagerModule from '../dao/ProductManager.js';
 const { ProductManager } = ProductManagerModule;
-let filePath = new URL('../src/data/products.json', import.meta.url);
 
+let productsFilePath = path.join(__dirname,'..','src', "data", "products.json");
 class CartManager {
     constructor() {
-        this.filePath = new URL('../data/carts.json', import.meta.url);
+        this.cartsFilePath = path.join(__dirname,'..','src', "data", "carts.json")
         this.carts = [];
     }   
     async loadCartData() {
+        console.log('Testing Path',this.cartsFilePath);
         try {
-        const data = await filePromise.readFile(this.filePath, {
+        const data = await filePromise.readFile(this.cartsFilePath, {
             encoding: "utf8",
         });
         console.log("Carts data read from file:", data);
@@ -60,7 +59,7 @@ class CartManager {
     }
     // Add a product into the cart
     async addProductToCart(cid, pid) {
-        const manager = new ProductManager(filePath);
+        const manager = new ProductManager(productsFilePath);
         // Load carts data
         await this.loadCartData();
         // Find the index of the cart with the given id
@@ -99,7 +98,7 @@ class CartManager {
         try {
         // Write the updated array back to the file
         await filePromise.writeFile(
-            this.filePath,
+            this.cartsFilePath,
             JSON.stringify(carts, null, 5)
         );
         } catch (error) {
@@ -108,6 +107,4 @@ class CartManager {
         }
     }
 }
-
-//module.exports = CartManager;
 export default {CartManager};
