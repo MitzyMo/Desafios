@@ -1,4 +1,3 @@
-//const { promises: filePromise } = require("fs");
 import { promises as filePromise } from "fs";
 //1 . Build a "ProductManager" class that manages a set of products.
 class ProductManager {
@@ -10,7 +9,7 @@ class ProductManager {
     async getProducts() {
         try {
         const data = await filePromise.readFile(this.path, { encoding: "utf8" });
-        console.log("Products data read from file:", data);
+        //console.log("Products data read from file:", data);
         return JSON.parse(data);
         } catch (error) {
         if (error.code === "ENOENT") {
@@ -54,7 +53,7 @@ class ProductManager {
         stock,
         brand,
         category,
-        thumbnails = [],
+        thumbnail = [],
         images = []
     ) {
         // Validate mandatory fields
@@ -89,7 +88,7 @@ class ProductManager {
         status,
         stock,
         category,
-        thumbnails,
+        thumbnail,
         images,
         };
         // Add the new product to the existing products array
@@ -174,7 +173,7 @@ class ProductManager {
     }
 }
 
-//module.exports = ProductManager;
+
 export default {ProductManager};
 /* 
 //-------------------------------- TESTING --------------------------------

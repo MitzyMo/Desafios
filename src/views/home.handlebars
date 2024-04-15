@@ -1,31 +1,32 @@
 
-<h1>Products List:</h1>
-
-{{!-- https://developer.mozilla.org/en-US/docs/Glossary/Falsy --}}
-
-  {{#each data}}
-  <li>
-    <h3>{{title}}</h3>
-    <dl>
-      <dt>Quantity:</dt>
-      <dd>{{stock}}</dd>
-      <dt>Price:</dt>
-      <dd>
-        ${{price}}
-        {{#if status}}
-        <strong>Order now!</strong>
-        {{/if}}
-      </dd>
-    </dl>
-  </li>
-  {{/each}}
-
-
+<ul class="breadcrumb">
+  <li><a href="/">🏠 Home </a></li>
+  <li><a href="/realtimeproducts">Real Time Products</a></li>
+</ul>
+<hr>
+    <h1>Products</h1>
+    {{#each data}}
+    <div class="product">
+        <div class="product-image">
+            <img src="{{thumbnail}}" alt="{{title}}">
+        </div>
+        <div class="product-details">
+            <div class="product-title">{{title}}</div>
+            <div class="product-description">{{description}}</div>
+            <div class="product-code">Product Code: {{code}}</div>
+            <div class="product-price">Price: ${{price}}</div>
+            <div class="product-discount">Discount: {{discountPercentage}}%</div>
+            <div class="product-rating">Rating: {{rating}}</div>
+            <div class="product-stock">Stock: {{stock}}</div>
+            <div class="product-brand">Brand: {{brand}}</div>
+            <div class="product-category">Category: {{category}}</div>
+        </div>
+    </div>
+    {{/each}}
 
 
 
 <br><br>
-<a href="/">Home</a>
 
 
-<a href="/realtimeproducts">Real TimeProducts</a>
+

@@ -395,3 +395,73 @@ svg {
     transform: rotateZ( -15deg)
   }
 }
+
+/* PRODUCT LIST */
+.product {
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  padding: 10px;
+  display: flex;
+}
+
+.product-image {
+  flex: 0 0 150px;
+  margin-right: 20px;
+}
+
+.product-image img {
+  max-width: 100%;
+}
+
+.product-details {
+  flex-grow: 1;
+}
+
+.product-title {
+  font-weight: bold;
+}
+
+.product-description {
+  margin-bottom: 10px;
+}
+
+.product-price {
+  color: green;
+}
+
+.product-stock {
+  color: blue;
+}
+
+/* BREADCRUMBS */
+ul.breadcrumb {
+  padding: 10px 16px;
+  list-style: none;
+  background-color: #eee;
+}
+
+/* Display list items side by side */
+ul.breadcrumb li {
+  display: inline;
+  font-size: 18px;
+}
+
+/* Add a slash symbol (/) before/behind each list item */
+ul.breadcrumb li + li:before {
+  padding: 8px;
+  color: black;
+  content: "/\00a0";
+}
+
+/* Add a color to all links inside the list */
+ul.breadcrumb li a {
+  color: #0275d8;
+  text-decoration: none;
+}
+
+/* Add a color on mouse-over */
+ul.breadcrumb li a:hover {
+  color: #01447e;
+  text-decoration: underline;
+}
+

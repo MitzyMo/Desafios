@@ -2,6 +2,7 @@ import path from 'path'; // Import path module
 import __dirname from "../utils.js"; // Import __dirname from utils.js
 import express from 'express';
 import ProductManagerModule from '../dao/ProductManager.js';
+import serverSocket from '../app.js'; // Import the serverSocket instance
 const { ProductManager } = ProductManagerModule;
 const router = express.Router();
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
@@ -52,14 +53,16 @@ router.get("/", async (request, response) => {
         request.body.stock,
         request.body.brand,
         request.body.category,
-        request.body.thumbnails,
+        request.body.thumbnail,
         request.body.images
         );
         response.status(201).json(product);
+        serverSocket.emit("products", await manager.getProducts());
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
     });
+
     //Update Product
     router.put("/:pid", async (request, response) => {
     let pid = request.params.pid;
@@ -85,6 +88,7 @@ router.get("/", async (request, response) => {
         try {
         const dproduct = await manager.deleteProduct(pid);
         response.json(dproduct);
+        serverSocket.emit("products", await manager.getProducts());
         } catch (error) {
         response.status(400).json({ error: error.message });
         }
