@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 import path from 'path'; // Import path module
 import __dirname from "../utils.js"; // Import __dirname from utils.js
-import ProductManagerModule from '../dao/ProductManager.js';
+import ProductManagerModule from '../dao/ProductManagerFileSystem.js';
 const { ProductManager } = ProductManagerModule;
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
 const manager = new ProductManager(filePath);
@@ -26,5 +26,8 @@ router.get("/realtimeproducts", (request, response) => {
     return response.status(200).render('realTimeProducts',{styles:'main.css'});
     });
 
+    router.get("/chat", (request, response) => {
+        return  response.status(200).render("chat",{styles:'main.css'});
+      });
 
 export default router;

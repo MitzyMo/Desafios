@@ -1,7 +1,7 @@
 import path from 'path'; // Import path module
 import __dirname from "../utils.js"; // Import __dirname from utils.js
 import express from 'express';
-import ProductManagerModule from '../dao/ProductManager.js';
+import ProductManagerModule from '../dao/ProductManagerFileSystem.js';
 import serverSocket from '../app.js'; // Import the serverSocket instance
 const { ProductManager } = ProductManagerModule;
 const router = express.Router();
@@ -12,7 +12,6 @@ router.get("/", async (request, response) => {
     //console.log(filePath);
     try {
         let data = await manager.getProducts();
-
         let limit = request.query.limit;
         if (Number(limit) && limit > 0) {
         data = data.slice(0, limit);

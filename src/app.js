@@ -4,9 +4,12 @@ import { Server } from "socket.io";
 import productRouter from "./routes/productsRouter.js";
 import cartsRouter from "./routes/cartsRouter.js";
 import viewsRouter from "./routes/viewsRouter.js";
-import path from "path"; // Import path module
-import __dirname from "./utils.js"; // Import __dirname from utils.js
-import ProductManagerModule from "./dao/ProductManager.js"
+import path from "path"; 
+import __dirname from "./utils.js"; 
+import ProductManagerModule from "./dao/ProductManagerFileSystem.js"
+import mongoose from "mongoose";
+
+
 const { ProductManager } = ProductManagerModule;
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
 const manager = new ProductManager(filePath);
@@ -34,6 +37,22 @@ const serverHTTP = app.listen(PORT, (error) => {
   return console.log(`Server connected in port ${PORT}`);
 });
 
+const bdConnection = async () => {
+  try {
+    await mongoose.connect(
+      "mongodb+srv://BackendUser:47l4sP455w0rd@cluster0.mywij2y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      {
+        dbName: "ecommerce",
+      }
+    );
+    console.log("Mongoose online");
+  } catch (error) {
+    console.log("Error DB", error.message);
+  }
+};
+
+bdConnection();
+
 // const io = new Server(serverHTTP); To call socket io.
 serverSocket = new Server(serverHTTP);
 
@@ -44,3 +63,6 @@ serverSocket.on("connection", async socket => {
 });
 
 export default serverSocket;
+
+//BackendUser
+//47l4sP455w0rd
