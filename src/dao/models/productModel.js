@@ -20,16 +20,16 @@ import mongoose from "mongoose"
 const collectionName = "products"
 const productSchema = new mongoose.Schema(
     {
-        title:{ type: String, required:[ture, 'The product Name is mandatory']} ,
-        description:{ type: String, required:[ture, 'The Description is mandatory']} ,
-        code:{ type: String, required:[ture, 'The Code is mandatory and must be unique'], unique:true} ,
-        price:{ type: Number, required:[ture, 'The Price is mandatory']} ,
+        title:{ type: String, required:[true, 'The product Name is mandatory']} ,
+        description:{ type: String, required:[true, 'The Description is mandatory']} ,
+        code:{ type: String, required:[true, 'The Code is mandatory and must be unique'], unique:true} ,
+        price:{ type: Number, required:[true, 'The Price is mandatory']} ,
         discountPercentage: Number,
         rating: Number,
-        status:{ type: Boolean, required:[ture, 'The Status is mandatory']} ,
-        stock:{ type: Number, required:[ture, 'The Stock is mandatory']} ,
+        status:{ type: Boolean, required:[true, 'The Status is mandatory']} ,
+        stock:{ type: Number, required:[true, 'The Stock is mandatory']} ,
         brand: String,
-        category:{ type: String, required:[ture, 'The Category is mandatory']} ,
+        category:{ type: String, required:[true, 'The Category is mandatory']} ,
         thumbnail: [{ img: { type: String } }],
         images: [{ img: { type: String } }]
     },

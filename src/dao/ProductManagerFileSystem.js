@@ -22,7 +22,6 @@ class ProductManager {
         }
         }
     }
-
     //4. You must have an "addProduct" method which will add a product to the initial product array.
     /*         
                     - Validate that the "code" field is not repeated and that all fields are mandatory. When adding it, it must be created with an auto-incrementable id. 
@@ -115,9 +114,8 @@ class ProductManager {
         }
     }
     /*
-                    6. It must have an updateProduct method, which must receive the id of the product to update, as well as the field to  update (it can be the whole object, as in a DB), and must update the product that has that id in the file.
-                        ITS ID MUST NOT BE DELETED
-                        */
+    6. It must have an updateProduct method, which must receive the id of the product to update, as well as the field to  update (it can be the whole object, as in a DB), and must update the product that has that id in the file. ITS ID MUST NOT BE DELETED
+    */
     async updateProduct(id, updatedFields) {
         let products = await this.getProducts();
         const product = products.findIndex((product) => product.id === id);
@@ -136,8 +134,8 @@ class ProductManager {
         }
     }
     /*
-                    7. It must have a deleteProduct method, which must receive an id and must delete the product that has that id in the file.
-                        */
+    7. It must have a deleteProduct method, which must receive an id and must delete the product that has that id in the file.
+     */
     async deleteProduct(id) {
         let products = await this.getProducts();
         const product = products.find((product) => product.id === id);
@@ -172,7 +170,6 @@ class ProductManager {
         }
     }
 }
-
 
 export default {ProductManager};
 /* 

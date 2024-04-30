@@ -6,13 +6,8 @@ import cartsRouter from "./routes/cartsRouter.js";
 import viewsRouter from "./routes/viewsRouter.js";
 import path from "path"; 
 import __dirname from "./utils.js"; 
-import ProductManagerModule from "./dao/ProductManagerFileSystem.js"
 import mongoose from "mongoose";
-
-
-const { ProductManager } = ProductManagerModule;
-let filePath = path.join(__dirname,'..','src', "data", "products.json");
-const manager = new ProductManager(filePath);
+import { productModel } from "./dao/models/productModel.js";
 
 const PORT = 3000;
 const app = express();
@@ -58,7 +53,7 @@ serverSocket = new Server(serverHTTP);
 
 serverSocket.on("connection", async socket => {
   console.log(`Client with id ${socket.id}`);
-  const products = await manager.getProducts();
+  const products = await productModel.find();
   socket.emit("products", products);
 });
 

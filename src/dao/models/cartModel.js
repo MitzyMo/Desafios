@@ -1,6 +1,7 @@
 import mongoose, { SchemaTypes } from "mongoose";
-const cartsCollection = "carts";
-const cartsSchema = new mongoose.Schema({
+
+const collectionName = "carts";
+const cartSchema = new mongoose.Schema({
   products: [
     {
       productId: {
@@ -9,9 +10,9 @@ const cartsSchema = new mongoose.Schema({
       },
       quantity: { 
         type: Number, 
-        required: [ture, "The quantity is mandatory"] },
+        required: [true, "The quantity is mandatory"] },
     },
   ],
 });
 
-export const cartsModel = mongoose.model(cartsCollection, cartsSchema);
+export const cartModel = mongoose.model(collectionName, cartSchema);

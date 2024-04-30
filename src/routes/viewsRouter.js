@@ -3,13 +3,14 @@ const router = express.Router();
 import path from 'path'; // Import path module
 import __dirname from "../utils.js"; // Import __dirname from utils.js
 import ProductManagerModule from '../dao/ProductManagerFileSystem.js';
+import { productModel } from "../dao/models/productModel.js";
 const { ProductManager } = ProductManagerModule;
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
 const manager = new ProductManager(filePath);
 
 router.get("/", async (request, response) => {
     try {
-        let data = await manager.getProducts();
+        let data = await productModel.find();
         let limit = request.query.limit;
         if (Number(limit) && limit > 0) {
         data = data.slice(0, limit);
@@ -28,6 +29,7 @@ router.get("/realtimeproducts", (request, response) => {
 
     router.get("/chat", (request, response) => {
         return  response.status(200).render("chat",{styles:'main.css'});
-      });
+
+    });
 
 export default router;
