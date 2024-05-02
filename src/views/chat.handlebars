@@ -1,18 +1,23 @@
-<main class="mainChat">
-  <section class="sectionChat">
-    <input type="text" id="message" placeholder="Escriba un mensaje:" />
-    <div id="messages"></div>
+<hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mx-auto">
+                <div class="card mt-5">
+                    <div class="card-body text-center">
+                        <h1 class="text-secondary">
+                          CHAT WITH US
+                          </h1>
+                        <h5 class="text-muted">
+                          Write Anything
+                          </h5>
+                          <div id="messages"></div>
+                        <input class="mt-5" type="text" id="message" placeholder="Type your message...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  </section>
-</main>
-{{! SweetAlert Script }}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{{! Toastify Script }}
-<script
-  type="text/javascript"
-  src="https://cdn.jsdelivr.net/npm/toastify-js"
-></script>
-{{! WebSocket Script }}
 <script src="/socket.io/socket.io.js"></script>
-{{! Main Script }}
 <script src="/js/chat.js"></script>

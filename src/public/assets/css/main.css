@@ -465,3 +465,38 @@ ul.breadcrumb li a:hover {
   text-decoration: underline;
 }
 
+
+/*-------- CHAT ---------*/
+#messages {
+  margin-top: 15px;
+  width: 90%;
+  max-height: 350px;
+  overflow-y: scroll;
+  box-shadow: 0px 0px 5px #333 inset;
+  padding: 5px;
+  background-color: #f0f0f0;
+  display: flex; /* Add flex display */
+  flex-direction: column; /* Arrange items vertically */
+  align-items: flex-end; /* Align items to the end (right) of the container */
+}
+
+.message {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #fff;
+  display: inline-block;
+  margin-top: 5px;
+  max-width: 80%;
+  align-self: flex-end; /* Align message to the end (right) of the container */
+}
+
+.message strong {
+  color: #333; /* Changed text color for stronger contrast */
+}
+
+.message i {
+  font-style: italic; /* Added italic style to message content */
+}
+/*-------- CHAT ---------*/
+

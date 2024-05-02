@@ -4,13 +4,13 @@ import { cartModel } from "../dao/models/cartModel.js";
 export const getCartById = async (request, response) => {
     const { cid } = request.params;
     try {
-        const cart = await cartModel.findById(Number(cid));
+        const cart = await cartModel.findById(cid);
         if (!cart) {
-        return response.status(404).json({ error: "Cart not found" });
+        return response.status(404).json({ error:`Cart with id ${cid} not found.` });
         }
         return response.status(201).json({ cart });
     } catch (error) {
-        return response.status(400).json({ error: error.message });
+        return response.status(500).json({ error:`Contact your administrator.` });
     }
 };
 
@@ -20,7 +20,7 @@ export const createCart = async (request, response) => {
         const cart = await cartModel.create({});
         return response.status(201).json({ cart });
     } catch (error) {
-        return response.status(400).json({ error: error.message });
+        return response.status(500).json({ error:`Contact your administrator.` })
     }
 };
 
@@ -28,13 +28,11 @@ export const createCart = async (request, response) => {
 export const addProductToCart = async (request, response) => {
     const { cid, pid } = request.params;
     try {
-        const cart = await cartModel.findById(Number(cid));
+        const cart = await cartModel.findById(cid);
         if (!cart) {
-        return response.status(404).json({ error: "Cart not found" });
+        return response.status(404).json({ error:`Cart with id ${cid} not found.` });
         }
-        const productIndex = cart.products.find(
-        (product) => product.productId === pid
-        );
+        const productIndex = cart.products.find(product => product.productId.toString() === pid);
         if (productIndex) {
         productIndex.quantity++;
         } else {
@@ -43,6 +41,6 @@ export const addProductToCart = async (request, response) => {
         cart.save();
         return response.status(201).json({ cart });
     } catch (error) {
-        return response.status(400).json({ error: error.message });
+        return response.status(500).json({ error:`Contact your administrator.` });
     }
 };

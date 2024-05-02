@@ -1,6 +1,6 @@
 const socket = io();
 socket.on("products", (products) => {
-  console.log(products);
+  console.log("Received products from server:", products);
   const productsContainer = document.getElementById("products");
   productsContainer.innerHTML = ""; // Clear previous content
 

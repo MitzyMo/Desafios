@@ -1,15 +1,17 @@
 import express from "express";
+import 'dotenv/config';
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 import productRouter from "./routes/productsRouter.js";
 import cartsRouter from "./routes/cartsRouter.js";
 import viewsRouter from "./routes/viewsRouter.js";
-import path from "path"; 
-import __dirname from "./utils.js"; 
+import path from "path";
+import __dirname from "./utils.js";
 import mongoose from "mongoose";
 import { productModel } from "./dao/models/productModel.js";
+import { messagesModel } from "./dao/models/messageModel.js";
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 const app = express();
 let serverSocket;
 
@@ -34,8 +36,7 @@ const serverHTTP = app.listen(PORT, (error) => {
 
 const bdConnection = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://BackendUser:47l4sP455w0rd@cluster0.mywij2y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    await mongoose.connect(process.env.dbConnString,
       {
         dbName: "ecommerce",
       }
@@ -48,16 +49,37 @@ const bdConnection = async () => {
 
 bdConnection();
 
-// const io = new Server(serverHTTP); To call socket io.
 serverSocket = new Server(serverHTTP);
 
-serverSocket.on("connection", async socket => {
+serverSocket.on("connection", async (socket) => {
   console.log(`Client with id ${socket.id}`);
   const products = await productModel.find();
   socket.emit("products", products);
+
+  let users = [];
+
+  console.log(`User with id: ${socket.id}`);
+
+  socket.on("id", async (name) => {
+    users.push({ id: socket.id, name });
+    let messages = await messagesModel.find().lean();
+    messages = messages.map((m) => {
+      return { name: m.user, message: m.message };
+    });
+    socket.emit("previousMessage", messages);
+    socket.broadcast.emit("newUser", name);
+  });
+
+  socket.on("message", async (name, message) => {
+    await messagesModel.create({ user: name, message });
+    serverSocket.emit("newMessage", name, message);
+  });
+});
+
+// Consolidate "exit" event listeners into a single listener
+process.on("exit", (code) => {
+  console.log(`Process exiting with code ${code}`);
+  // Clean up resources, if necessary
 });
 
 export default serverSocket;
-
-//BackendUser
-//47l4sP455w0rd
