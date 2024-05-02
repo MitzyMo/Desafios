@@ -10,10 +10,6 @@ socket.on("products", (products) => {
     productDiv.classList.add("product");
 
     // Create product image container
-        /*         imageDiv.innerHTML = `
-        <div class="product-image">
-            <img src=${product.thumbnail} alt=${product.title}>
-        </div>`; */
     const imageDiv = document.createElement("div");
     imageDiv.classList.add("product-image");
     let image = document.createElement("img");

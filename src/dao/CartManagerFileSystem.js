@@ -1,7 +1,7 @@
 import path from 'path'; // Import path module
 import __dirname from "../utils.js"; // Import __dirname from utils.js
 import { promises as filePromise } from 'fs';
-import ProductManagerModule from '../dao/ProductManager.js';
+import ProductManagerModule from './ProductManagerFileSystem.js';
 const { ProductManager } = ProductManagerModule;
 
 let productsFilePath = path.join(__dirname,'..','src', "data", "products.json");
