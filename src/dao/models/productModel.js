@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from 'mongoose-paginate-v2';
 
 const collectionName = "products";
 const productSchema = new mongoose.Schema(
@@ -20,6 +21,10 @@ const productSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Apply pagination plugin to the product schema
+productSchema.plugin(paginate);
+// Transform function to exclude `__v` property from response
 productSchema.set('toJSON',{
     transform: function(document,retorno){
         delete retorno.__v;

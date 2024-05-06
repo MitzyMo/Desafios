@@ -1,32 +1,62 @@
-
-<ul class="breadcrumb">
-  <li><a href="/">🏠 Home </a></li>
-  <li><a href="/realtimeproducts">Real Time Products</a></li>
-</ul>
-<hr>
-    <h1>Products</h1>
+<header>
+  <h1>Products</h1>
+  <hr />
+  <ul class="breadcrumb">
+    <li><a href="/">🏠 Home </a></li>
+    <li><a href="/realtimeproducts">Real Time Products</a></li>
+  </ul>
+  <hr />
+</header>
+<main>
+  <div class="products-container">
     {{#each data}}
-    <div class="product">
+      <div class="product">
         <div class="product-image">
-            <img src="{{thumbnail}}" alt="{{title}}">
+          <img src="{{thumbnail}}" alt="{{title}}" />
         </div>
         <div class="product-details">
-            <div class="product-title">{{title}}</div>
-            <div class="product-description">{{description}}</div>
-            <div class="product-code">Product Code: {{code}}</div>
-            <div class="product-price">Price: ${{price}}</div>
-            <div class="product-discount">Discount: {{discountPercentage}}%</div>
-            <div class="product-rating">Rating: {{rating}}</div>
-            <div class="product-stock">Stock: {{stock}}</div>
-            <div class="product-brand">Brand: {{brand}}</div>
-            <div class="product-category">Category: {{category}}</div>
+          <div class="product-title">{{title}}</div>
+          <div class="product-description">{{description}}</div>
+          <div class="product-code">Product Code: {{code}}</div>
+          <div class="product-price">Price: ${{price}}</div>
+          <div class="product-discount">Discount: {{discountPercentage}}%</div>
+          <div class="product-rating">Rating: {{rating}}</div>
+          <div class="product-stock">Stock: {{stock}}</div>
+          <div class="product-brand">Brand: {{brand}}</div>
+          <div class="product-category">Category: {{category}}</div>
         </div>
-    </div>
+      </div>
     {{/each}}
-
-
-
-<br><br>
-
-
-
+  </div>
+  <div class="pagination">
+    <ul>
+      <li><a
+          href="/products?limit={{limit}}&page=1&category={{category}}&status={{status}}&sort={{sort}}"
+        >Pg. 1</a></li>
+      {{#if hasPrevPage}}
+        <li><a
+            href="/products?limit={{limit}}&page={{prevPage}}&category={{category}}&status={{status}}&sort={{sort}}"
+          >Previous</a></li>
+      {{/if}}
+      {{#if hasNextPage}}
+        <li><a
+            href="/products?limit={{limit}}&page={{nextPage}}&category={{category}}&status={{status}}&sort={{sort}}"
+          >Next</a></li>
+      {{/if}}
+      <form action="/products" method="get">
+        <label for="page-input">Go to page:</label>
+        <input
+          type="number"
+          id="page-input"
+          name="page"
+          min="1"
+          max="{{totalPages}}"
+        />
+        <input type="submit" value="Go" />
+      </form>
+      <li><a
+          href="/products?limit={{limit}}&page={{totalPages}}&category={{category}}&status={{status}}&sort={{sort}}"
+        >Pg. {{totalPages}}</a></li>
+    </ul>
+  </div>
+</main>
