@@ -1,0 +1,101 @@
+<!-- productDetail.handlebar -->
+
+<section class="py-5">
+  <div class="container">
+    <div class="row gx-5">
+      <aside class="col-lg-6">
+        <div class="border rounded-4 mb-3 d-flex justify-content-center">
+          <a data-fslightbox="mygalley" class="rounded-4" target="_blank" data-type="image" href="{{product.image}}">
+            <img style="max-width: 100%; max-height: 100vh; margin: auto;" class="rounded-4 fit" src="{{product.image}}" />
+          </a>
+        </div>
+        <div class="d-flex justify-content-center mb-3">
+          {{#each product.images}}
+          <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" href="{{this}}">
+            <img width="60" height="60" class="rounded-2" src="{{this}}" />
+          </a>
+          {{/each}}
+        </div>
+      </aside>
+      <main class="col-lg-6">
+        <div class="ps-lg-3">
+          <h4 class="title text-dark">
+            {{product.title}}
+          </h4>
+          <div class="d-flex flex-row my-3">
+            <div class="text-warning mb-1 me-2">
+              <!-- Rating stars can be added here dynamically -->
+            </div>
+            <span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1"></i>{{product.orders}} orders</span>
+            <span class="text-success ms-2">In stock</span>
+          </div>
+
+          <div class="mb-3">
+            <span class="h5">{{product.price}}</span>
+            <!-- You can add more details about pricing if needed -->
+          </div>
+
+          <p>
+            {{product.description}}
+          </p>
+
+          <div class="row">
+            <!-- Dynamic product details can be added here -->
+          </div>
+
+          <hr />
+
+          <div class="row mb-4">
+            <!-- Dynamic options for size and quantity can be added here -->
+          </div>
+          <a href="#" class="btn btn-warning shadow-0"> Buy now </a>
+          <a href="#" class="btn btn-primary shadow-0"> <i class="me-1 fa fa-shopping-basket"></i> Add to cart </a>
+          <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i class="me-1 fa fa-heart fa-lg"></i> Save </a>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<section class="bg-light border-top py-4">
+  <div class="container">
+    <div class="row gx-4">
+      <div class="col-lg-8 mb-4">
+        <div class="border rounded-2 px-3 py-2 bg-white">
+          <!-- Pills navs -->
+          <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+            <!-- Nav tabs can be added dynamically -->
+          </ul>
+          <!-- Pills content -->
+          <div class="tab-content" id="ex1-content">
+            <!-- Tab content can be added dynamically -->
+          </div>
+          <!-- Pills content -->
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="px-0 border rounded-2 shadow-0">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Similar items</h5>
+              {{#each similarProducts}}
+              <div class="d-flex mb-3">
+                <a href="#">
+                  <img src="{{this.image}}" style="min-width: 96px; height: 96px;" class="img-md img-thumbnail" />
+                </a>
+                <div class="info">
+                  <a href="#" class="nav-link mb-1">
+                    {{this.title}} <br />
+                    <!-- Additional details about similar products can be added here -->
+                  </a>
+                  <strong class="text-dark"> {{this.price}}</strong>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
