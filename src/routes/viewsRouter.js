@@ -1,24 +1,9 @@
 import express from "express";
-import { ProductManager } from "../controller/products.js";
+import { ProductManager } from "../controller/productController.js";
 const router = express.Router();
 const manager = new ProductManager();
 import { productModel } from "../dao/models/productModel.js";
 
-//Retorna todos los productos
-router.get("/", async (request, response) => {
-  try {
-    let data = await productModel.find().lean();
-    let limit = request.query.limit;
-    if (Number(limit) && limit > 0) {
-      data = data.slice(0, limit);
-    }
-    response.status(200).render("home", { data, limit, styles: "main.css" });
-  } catch (error) {
-    response
-      .status(500)
-      .render("error", { error: "Internal Server Error", styles: "main.css" });
-  }
-});
 
 //Retorna todos los productos
 router.get("/products", async (request, response) => {
@@ -44,6 +29,22 @@ router.get("/products", async (request, response) => {
   }
 });
 
+
+//Retorna todos los productos
+router.get("/", async (request, response) => {
+  try {
+    let data = await productModel.find().lean();
+    let limit = request.query.limit;
+    if (Number(limit) && limit > 0) {
+      data = data.slice(0, limit);
+    }
+    response.status(200).render("home", { data, limit, styles: "main.css" });
+  } catch (error) {
+    response
+      .status(500)
+      .render("error", { error: "Internal Server Error", styles: "main.css" });
+  }
+});
 
 //Products con Socket.io
 router.get("/realtimeproducts", (request, response) => {
