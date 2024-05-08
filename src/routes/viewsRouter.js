@@ -1,11 +1,10 @@
 import express from "express";
-import { ProductManager } from "../controller/productController.js";
-const router = express.Router();
-const manager = new ProductManager();
+import { ProductManager } from "../dao/ProductManagerDB.js"; // Correct import path
 import { productModel } from "../dao/models/productModel.js";
 
-
-//Retorna todos los productos
+const router = express.Router();
+const prodManager = new ProductManager();
+// Route to handle pagination and rendering
 router.get("/products", async (request, response) => {
   try {
     // Desestructure query params
@@ -15,8 +14,7 @@ router.get("/products", async (request, response) => {
     if (!category) category = "null";
     if (!sort) sort = "asc";
     // Get products with pagination, category filter, and sorting
-    let { docs: data, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await manager.getProductsPaginate(limit, page, category, status, sort);
-    // Render the Handlebars template with the data
+    let { docs: data, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage } = await prodManager.getProductsPaginate(limit, page, category, status, sort);
     response.status(200).render("home", {
       data, limit, category, status, sort, page, totalPages, hasPrevPage, hasNextPage, prevPage, nextPage,
       styles: "main.css",
@@ -27,10 +25,9 @@ router.get("/products", async (request, response) => {
       styles: "main.css",
     });
   }
-});
+ });
+ 
 
-
-//Retorna todos los productos
 router.get("/", async (request, response) => {
   try {
     let data = await productModel.find().lean();
@@ -46,13 +43,12 @@ router.get("/", async (request, response) => {
   }
 });
 
-//Products con Socket.io
 router.get("/realtimeproducts", (request, response) => {
   return response
     .status(200)
     .render("realTimeProducts", { styles: "main.css" });
 });
-//Chat con Socket.io
+
 router.get("/chat", (request, response) => {
   return response.status(200).render("chat", { styles: "main.css" });
 });

@@ -1,23 +1,19 @@
-import { productModel } from "../dao/models/productModel.js";
-import serverSocket from "../app.js"; // Import the serverSocket instance
+import serverSocket from "../app.js";
+import { ProductManager } from "../dao/ProductManagerDB.js";
 
-export class ProductManager {
-  //get all Products
-  async getProducts(request, response) {
-    try {
-      let limit = request.query.limit;
-      // if (Number(limit) && limit > 0) {data = data.slice(0, limit);}
-      let data = await productModel.find().limit(Number(limit));
-      let totalProducts = await productModel.countDocuments();
-      return response.json({ totalProducts, data });
-    } catch (error) {
-      return response.status(500).json({ error: "Internal Server Error" });
-    }
+const manager = new ProductManager();
+
+export const getProducts = async (req, res) => {
+  try {
+    const limit = req.query.limit;
+    const { totalProducts, data } = await manager.getProducts(limit);
+    res.json({ totalProducts, data });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
+};
 
-  // Get all Products with pagination
-// Get all Products with pagination and optional filters
-async getProductsPaginate(limit = 10, page = 1, category, status, sort) {
+export const getProductsPaginate = async (req, res) => {
   let sortQuery = {};
   if (sort === "asc") {
     sortQuery = { price: 1 };
@@ -32,122 +28,54 @@ async getProductsPaginate(limit = 10, page = 1, category, status, sort) {
     filterQuery.status = status;
   }
   try {
-    return await productModel.paginate(
-      filterQuery,
-      { limit, page, sort: sortQuery, lean: true }
-    );
+    const { limit, page, category, status, sort } = req.query;
+    const result = await manager.getProductsPaginate(limit, page, category, status, sort);
+    res.json(result);
   } catch (error) {
-    return { error: "Internal Server Error" };
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-
-
-  // Get Products by ID
-  async getProductById(request, response) {
-    let pid = request.params.pid;
-    try {
-      const product = await productModel.findById(pid);
-      response.json({ product }); // Send the product back to the client
-    } catch (error) {
-      response
-        .status(404)
-        .json({ error: `Product with id ${pid} was not found.` });
-    }
+export const getProductById = async (req, res) => {
+  try {
+    const pid = req.params.pid;
+    const product = await manager.getProductById(pid);
+    res.json({ product });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
   }
+};
 
-  // Add Product
-  async addProduct(request, response) {
-    try {
-      // Extracting fields from the request body
-      const {
-        title,
-        description,
-        code,
-        price,
-        discountPercentage,
-        rating,
-        status,
-        stock,
-        brand,
-        category,
-        thumbnail,
-        images,
-      } = request.body;
-
-      // Validate mandatory fields
-      if (!title || !description || !code || !price || !status || !category) {
-        return response.status(400).json({
-          error:
-            "The fields title, description, code, price, status, stock, and category are mandatory",
-        });
-      }
-
-      // Check uniqueness of the "code" field
-      const existingProduct = await productModel.findOne({ code: code });
-      if (existingProduct) {
-        return response
-          .status(400)
-          .json({ error: "A product with the same code already exists" });
-      }
-
-      // Creating a new product
-      const product = await productModel.create({
-        title,
-        description,
-        code,
-        price,
-        discountPercentage,
-        rating,
-        status,
-        stock,
-        brand,
-        category,
-        thumbnail,
-        images,
-      });
-
-      // Emitting product update event to socket
-      serverSocket.emit("products", await productModel.find());
-
-      // Sending the newly created product in the response
-      response.status(201).json({ product });
-    } catch (error) {
-      response.status(400).json({ error: error.message });
-    }
+export const addProduct = async (req, res) => {
+  try {
+    const product = req.body;
+    const newProduct = await manager.addProduct(product);
+    serverSocket.emit("products", await manager.getProducts());
+    res.status(201).json({ product: newProduct });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
+};
 
-  // Update Product
-  async updateProduct(request, response) {
-    let pid = request.params.pid;
-    try {
-      const { _id, ...rest } = request.body;
-      const uproduct = await productModel.findByIdAndUpdate(
-        pid,
-        { ...rest },
-        { new: true }
-      );
-      response.json({ uproduct });
-      serverSocket.emit("products", await productModel.find());
-    } catch (error) {
-      response
-        .status(404)
-        .json({ error: `Product with id ${pid} was not found.` });
-    }
+export const updateProduct = async (req, res) => {
+  try {
+    const pid = req.params.pid;
+    const updatedProduct = req.body;
+    const uproduct = await manager.updateProduct(pid, updatedProduct);
+    serverSocket.emit("products", await manager.getProducts());
+    res.json({ uproduct });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
   }
+};
 
-  // Delete Product
-  async deleteProduct(request, response) {
-    let pid = request.params.pid;
-    try {
-      const dproduct = await productModel.findByIdAndDelete(pid);
-      response.json(dproduct);
-      serverSocket.emit("products", await productModel.find());
-    } catch (error) {
-      response
-        .status(404)
-        .json({ error: `Product with id ${pid} was not found.` });
-    }
+export const deleteProduct = async (req, res) => {
+  try {
+    const pid = req.params.pid;
+    const dproduct = await manager.deleteProduct(pid);
+    serverSocket.emit("products", await manager.getProducts());
+    res.json(dproduct);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
   }
-}
-//export default { ProductManager };
+};

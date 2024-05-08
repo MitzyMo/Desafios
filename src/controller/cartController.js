@@ -81,18 +81,9 @@ async deleteAllProductsFromCart(request, response){
     }
 };
 // Update cart with an array of products
-async updateCart(request, response) {
-    const { cid } = request.params;
-    const { products } = request.body;
+async updateCart(cid, cart) {
     try {
-        const cart = await cartModel.findById(cid);
-        if (!cart) {
-            return response.status(404).json({ error: `Cart with id ${cid} not found.` });
-        }
-        // Update cart products based on the array provided
-        cart.products = products;
-        await cart.save();
-        return response.status(200).json({ cart });
+        return await cartModel.updateOne({_id:cid},cart);
     } catch (error) {
         return response.status(500).json({ error: `Contact your administrator.` });
     }
