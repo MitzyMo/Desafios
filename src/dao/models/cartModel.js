@@ -19,6 +19,7 @@ const cartSchema = new mongoose.Schema({
   timestamps: true,
 }
 );
+// Transform function to exclude `__v` property from response
 cartSchema.set('toJSON',{
   transform: function(document,retorno){
       delete retorno.__v;

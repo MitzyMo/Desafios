@@ -38,7 +38,7 @@ const bdConnection = async () => {
   try {
     await mongoose.connect(process.env.dbConnString,
       {
-        dbName: "ecommerce",
+        dbName:process.env.dbName
       }
     );
     console.log("Mongoose online");
