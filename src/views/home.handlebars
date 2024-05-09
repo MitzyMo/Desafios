@@ -1,13 +1,12 @@
 <header>
-  <h1>Products</h1>
-  <hr />
-  <ul class="breadcrumb">
-    <li><a href="/">🏠 Home </a></li>
-    <li><a href="/realtimeproducts">Real Time Products</a></li>
-    <li><a id="cart" href="/cart/{{cart._id}}">Shopping 🛒</a></li>
-  </ul>
-  
-  <hr />
+<h1>Products</h1>
+<hr />
+<ul class="breadcrumb">
+  <li><a href="/">🏠 Home </a></li>
+  <li><a href="/realtimeproducts">Real Time Products</a></li>
+  <li><a href="/carts/6639237073f4746593a0ba96">Shopping 🛒</a></li>
+</ul>
+<hr />
 </header>
 <main>
   <div class="products-container">
@@ -28,7 +27,7 @@
           <div class="product-category">Category: {{category}}</div>
         </div>
         <!-- View button linking to product details page -->
-         <!--<a href="/products/{{_id}}" class="btn btn-primary">View</a>-->
+         <input type="text" value="6639237073f4746593a0ba96" id="cart">
          <button onclick="addToCart('{{_id}}')" >Add to Cart</button>
       </div>
     {{/each}}

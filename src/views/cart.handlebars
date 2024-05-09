@@ -1,13 +1,13 @@
-<h2>Cart {{cart._id}}</h2>
+<h2>Cart {{carts._id}}</h2>
 
 <ul>
-    {{#each cart.productos}}
+    {{#each carts.productos}}
         <li>
-            {{product.descripcion}} - Price: {{product.precio}} - quantity: {{quantity}}
+            {{product.description}} - Price: {{product.price}} - quantity: {{quantity}}
         </li>
     {{/each}}
 </ul>
 
 <br>
 <br>
-<a href="/productos">Keep Shopping</a>
+<a href="/products">Keep Shopping</a>

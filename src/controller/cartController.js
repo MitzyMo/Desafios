@@ -1,4 +1,5 @@
 import { cartModel } from "../dao/models/cartModel.js";
+import mongoose, { isValidObjectId } from 'mongoose';
 
 export class CartManager {
 // Route to list products in a cart
@@ -13,9 +14,9 @@ async getCartById (request, response){
     } catch (error) {
         return response.status(500).json({ error:`Contact your administrator.` });
     }
-};
+ }; 
 //Create a new Carrt, it creates it with the prodct passed through id
-async createCart() {
+async createCart(request, response) {
     try {
         const cart = await cartModel.create({});
         return response.status(201).json({ cart });
@@ -23,6 +24,7 @@ async createCart() {
         return response.status(500).json({ error:`Contact your administrator.` })
     }
 };
+
 // Route to add a product to a cart
 async addProductToCart(request, response){
     const { cid, pid } = request.params;
@@ -81,13 +83,17 @@ async deleteAllProductsFromCart(request, response){
     }
 };
 // Update cart with an array of products
-async updateCart(cid, cart) {
+async updateCart(cid, cart, response) {
     try {
-        return await cartModel.updateOne({_id:cid},cart);
+      const updatedCart = { products: cart };
+      await cartModel.updateOne({ _id: cid }, updatedCart);
+      return response.status(200).json({ message: "Cart updated successfully" });
     } catch (error) {
-        return response.status(500).json({ error: `Contact your administrator.` });
+      console.error(error);
+      return response.status(500).json({ error: "Error updating cart" });
     }
-};
+  }
+
 // Update product quantity in cart or remove product if quantity is 0
 async updateProdQtyInCart(request, response) {
     const { cid, pid } = request.params;
@@ -116,3 +122,5 @@ async updateProdQtyInCart(request, response) {
     }
 };
 }
+
+// ------------------------------------------------------------------
