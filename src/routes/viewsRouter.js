@@ -1,11 +1,11 @@
 import express from "express";
 import { ProductManager } from "../dao/ProductManagerDB.js";
 import { productModel } from "../dao/models/productModel.js";
-import { CartManager } from "../controller/cartController.js";
+import { CartManager } from "../dao/CartManagerDB.js";
 
 const router = express.Router();
-const prodManager = new ProductManager();
-const cartManager = new CartManager();
+const prodController = new ProductManager();
+const cartController = new CartManager();
 
 // Route to handle pagination and rendering
 router.get("/products", async (request, response) => {
@@ -24,7 +24,7 @@ router.get("/products", async (request, response) => {
       hasNextPage,
       prevPage,
       nextPage,
-    } = await prodManager.getProductsPaginate(
+    } = await prodController.getProductsPaginate(
       limit,
       page,
       category,
@@ -76,7 +76,7 @@ router.get("/", async (request, response) => {
 router.get("/carts/:cid", async(request, response)=>{
   try {
     console.log('testing');
-  let cart =   await cartManager.getCartById(request, response);
+  let cart =   await cartController.getCartById(request, response);
   console.log('cart',cart);
     response.setHeader('Content-Type','text/html');
     return response.status(200).render("cart", {cart});
