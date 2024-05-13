@@ -1,22 +1,30 @@
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import multer from "multer"
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-export default __dirname;
+    // otras validaciones
+    // preguntar por adminCoder@coder.com, y la contraseña adminCod3r123
+    // si son esos datos, devolves al usuario nombre "admin", email 
+    // adminCoder@coder.com y rol "admin"
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null,path.join(__dirname, './src/uploads') )
-    },
-    filename: function (request, file, cb) {
-        // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        // cb(null, file.fieldname + '-' + uniqueSuffix)
-        //Giving unique name to files
-        cb(null, Date.now() +"-"+file.originalname )
-
-    }
-})
-export const upload = multer({ storage: storage })
+    import { fileURLToPath } from 'url';
+    import { dirname } from 'path';
+    import multer from "multer"
+    import crypto from "crypto"
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    export default __dirname;
+    
+    const SECRET = "CoderCoder123";
+    export const generateHash = (password) => crypto.createHmac("sha256", SECRET).update(password).digest("hex");
+    
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, path.join(__dirname, './src/uploads'));
+        },
+        filename: function (request, file, cb) {
+            cb(null, Date.now() + "-" + file.originalname);
+        }
+    });
+    
+    export const upload = multer({ storage: storage });
+    

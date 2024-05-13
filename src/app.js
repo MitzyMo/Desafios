@@ -5,11 +5,13 @@ import { Server } from "socket.io";
 import productRouter from "./routes/productsRouter.js";
 import cartsRouter from "./routes/cartsRouter.js";
 import viewsRouter from "./routes/viewsRouter.js";
+import sessionRouter from "./routes/sessionRouter.js";
 import path from "path";
 import __dirname from "./utils.js";
 import mongoose from "mongoose";
 import { productModel } from "./dao/models/productModel.js";
 import { messagesModel } from "./dao/models/messageModel.js";
+import sessions from "express-session"
 
 const PORT = process.env.PORT;
 const app = express();
@@ -18,6 +20,9 @@ let serverSocket;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(sessions({
+  secret:"CoderCoder123", resave:true, saveUninitialized: true
+}))
 
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
@@ -26,6 +31,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
+app.use("/api/sessions", sessionRouter)
 
 const serverHTTP = app.listen(PORT, (error) => {
   if (error) {
