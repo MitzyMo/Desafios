@@ -4,8 +4,8 @@ import { CartManager } from "../dao/CartManagerDB.js";
 import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
-const prodController = new ProductManager();
-const cartController = new CartManager();
+const prodManager = new ProductManager();
+const cartManager = new CartManager();
 
 router.get("/", async (request, response) => {
   try {
@@ -72,7 +72,7 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
       hasNextPage,
       prevPage,
       nextPage,
-    } = await prodController.getProductsPaginate(
+    } = await prodManager.getProductsPaginate(
       limit,
       page,
       category,
@@ -104,14 +104,20 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
 });
 
 //Hardcode Get cart
-router.get("/carts/:cid", auth, async (request, response) => {
+//router.get("/carts/:cid", auth, async (request, response) => {
+
+router.get("/carts/:cid", async (request, response) => {
   try {
-    console.log("testing");
-    let cart = await cartController.getCartById(request, response);
-    console.log("cart", cart);
-    response.setHeader("Content-Type", "text/html");
+    // Extract cid from request params
+    const { cid } = request.params;
+
+    // Get the cart by id using the cartManager
+    const cart = await cartManager.getCartById(cid);
+
+    // Render the cart view and pass the cart data
     return response.status(200).render("cart", { cart });
   } catch (error) {
+    console.error(error); // Log the error for debugging
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
