@@ -12,7 +12,7 @@
     <div class="col-md-5 p-lg-5 mx-auto my-5">
         <h1 class="display-4 font-weight-normal">Welcome {{user.name}}</h1>
         <p class="lead font-weight-normal">You've logged in with your email: {{user.email}}</p>
-        <p class="lead font-weight-normal">You've logged in with your email: {{user.cart}}</p>
+        <p class="lead font-weight-normal">You're cart is waiting': {{user.cart}}</p>
         {{#if isAdmin}}
             <p class="lead font-weight-normal">You're logged in as an {{user.role}} </p>
         {{/if}}
@@ -23,7 +23,7 @@
 <hr>
 <main>
   <div class="products-container">
-    <input type="text" value="{{{user.cart}}}" id="cart" placeholder="{{{user.cart}}}">
+    <input type="text" value="{{{user.cart}}}" id="cart" placeholder="{{{user.cart}}}" hidden>
     {{#each data}}
       <div class="product">
         <div class="product-image">

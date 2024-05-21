@@ -7,18 +7,23 @@ export const router = Router();
 const userManager = new UserManager();
 
 router.post("/register", async (request, response) => {
-    let { name, email, role, password } = request.body;
+    let { name, email, role, password, web } = request.body;
     if (!name || !email || !password) {
-        return response
-            .status(400)
-            .json({ error: `Complete name, email, & password` });
+        if (web) {
+            return response.redirect(`/register?error=Complete email, & password`);
+            } else {
+            response.setHeader("Content-Type", "application/json");
+            return response.status(400).json({ error: `Complete email, & password` });
+            }
     }
-    
     let exists = await userManager.getBy({ email });
     if (exists) {
-        return response
-            .status(400)
-            .json({ error: `The ${email} is already registered` });
+        if (web) {
+            return response.redirect(`/register?error=The ${email} is already registered`);
+            } else {
+            response.setHeader("Content-Type", "application/json");
+            return response.status(400).json({ error: `The ${email} is already registered` });
+            }
     }
     
     password = generateHash(password);
@@ -31,7 +36,12 @@ router.post("/register", async (request, response) => {
             password,
             cart: newCart._id,
         });
-        response.status(200).json({ message: "User registered successfully", newUser });
+        if (web) {
+            return response.redirect(`/login?message=User ${name} registered successfully`);
+            } else {
+            response.setHeader("Content-Type", "application/json");
+            response.status(200).json({ message: "User registered successfully", newUser });
+            }
     } catch (error) {
         response.status(500).json({
             error: `Unexpected error, contact your administrator`,

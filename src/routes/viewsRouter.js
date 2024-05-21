@@ -9,30 +9,41 @@ const cartManager = new CartManager();
 
 router.get("/", async (request, response) => {
   try {
-    response.status(200).render("home", { styles: "main.css" });
+    response.status(200).render("home", { styles: "main.css", login:request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
-      styles: "main.css",
+      styles: "main.css"
     });
   }
 });
 
-router.get("/register", (request, response) => {
-  try {
-    response.status(200).render("register");
-  } catch (error) {
-    response.status(500).render("error", {
-      error: "Internal Server Error",
-      styles: "main.css",
-    });
+router.get("/register", (request, response, next)=>{
+  if(request.session.user){
+    response.redirect("/profile");
   }
-});
-
-router.get("/login", (request, response) => {
+  next()
+}, (request, response) => {
   let { error } = request.query;
   try {
-    response.status(200).render("login", { error });
+    response.status(200).render("register",{error, login:request.session.user});
+  } catch (error) {
+    response.status(500).render("error", {
+      error: "Internal Server Error",
+      styles: "main.css",
+    });
+  }
+});
+
+router.get("/login", (request, response, next)=>{
+  if(request.session.user){
+    response.redirect("/profile");
+  }
+  next()
+},(request, response) => {
+  let { error, message } = request.query;
+  try {
+    response.status(200).render("login", { error, message, login:request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -43,7 +54,7 @@ router.get("/login", (request, response) => {
 
 router.get("/profile", auth, (request, response) => {
   try {
-    response.status(200).render("profile", { user: request.session.user });
+    response.status(200).render("profile", { user: request.session.user, login:request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -94,6 +105,7 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
       styles: "main.css",
       user: request.session.user,
       isAdmin: request.session.isAdmin,
+      login:request.session.user
     });
   } catch (error) {
     response.status(500).render("error", {
@@ -102,11 +114,8 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
     });
   }
 });
-
-//Hardcode Get cart
-//router.get("/carts/:cid", auth, async (request, response) => {
-
-router.get("/carts/:cid", async (request, response) => {
+//Cart View after being authenticated.
+router.get("/carts/:cid",auth, async (request, response) => {
   try {
     // Extract cid from request params
     const { cid } = request.params;
@@ -115,7 +124,7 @@ router.get("/carts/:cid", async (request, response) => {
     const cart = await cartManager.getCartById(cid);
 
     // Render the cart view and pass the cart data
-    return response.status(200).render("cart", { cart });
+    return response.status(200).render("cart", { cart, login:request.session.user });
   } catch (error) {
     console.error(error); // Log the error for debugging
     response.status(500).render("error", {
@@ -128,11 +137,11 @@ router.get("/carts/:cid", async (request, response) => {
 router.get("/realtimeproducts", auth, (request, response) => {
   return response
     .status(200)
-    .render("realTimeProducts", { styles: "main.css" });
+    .render("realTimeProducts", { styles: "main.css", login:request.session.user });
 });
 
-router.get("/chat", (request, response) => {
-  return response.status(200).render("chat", { styles: "main.css" });
+router.get("/chat", auth, (request, response) => {
+  return response.status(200).render("chat", { styles: "main.css", login:request.session.user });
 });
 
 export default router;
