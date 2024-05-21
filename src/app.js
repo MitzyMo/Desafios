@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 import { productModel } from "./dao/models/productModel.js";
 import { messagesModel } from "./dao/models/messageModel.js";
 import sessions from "express-session";
-//import MongoStore from "connect-mongo";
+import MongoStore from "connect-mongo";
 
 const PORT = process.env.PORT;
 const app = express();
@@ -26,14 +26,14 @@ app.use(
     secret: "CoderCoder123",
     resave: true,
     saveUninitialized: true,
+    store: MongoStore.create({
+      ttl: 3600,
+      mongoUrl: process.env.dbConnString,
+      dbName: process.env.dbName,
+      collectionName:"sessions"
+    }),
   })
 );
-/* store: MongoStore.create({
-  ttl: 3600,
-  mongoUrl: process.env.dbConnString,
-  dbName: process.env.dbName,
-  collectionName:"sessions"
-}), */
 
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");

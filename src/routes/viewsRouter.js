@@ -8,8 +8,9 @@ const prodManager = new ProductManager();
 const cartManager = new CartManager();
 
 router.get("/", async (request, response) => {
+
   try {
-    response.status(200).render("home", { styles: "main.css", login:request.session.user });
+    response.status(200).render("home", { styles: "main.css", login:request.session.user});
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
