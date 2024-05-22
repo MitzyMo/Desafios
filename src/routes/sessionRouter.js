@@ -1,46 +1,25 @@
 import { Router } from "express";
 import { UserManager } from "../dao/UserManagerDB.js";
-import { generateHash } from "../utils.js";
+import { generateHash, validatePassword } from "../utils.js";
 import { createCartInternal } from "../controller/cartController.js";
+import passport from "passport";
 export const router = Router();
 
 const userManager = new UserManager();
 
-router.post("/register", async (request, response) => {
-    let { name, email, role, password, web } = request.body;
-    if (!name || !email || !password) {
-        if (web) {
-            return response.redirect(`/register?error=Complete email, & password`);
-            } else {
-            response.setHeader("Content-Type", "application/json");
-            return response.status(400).json({ error: `Complete email, & password` });
-            }
-    }
-    let exists = await userManager.getBy({ email });
-    if (exists) {
-        if (web) {
-            return response.redirect(`/register?error=The ${email} is already registered`);
-            } else {
-            response.setHeader("Content-Type", "application/json");
-            return response.status(400).json({ error: `The ${email} is already registered` });
-            }
-    }
-    
-    password = generateHash(password);
+router.get("/error", (request, response)=>{
+    response.setHeader('Content-Type','application/json');
+    return response.status(500).json({error:`You've encountered and error, please validate your data.`})
+})
+
+router.post("/register", passport.authenticate("register",{failureRedirect:"/api/sessions/error"}), async (request, response) => {
+    let {web} = request.body;
     try {
-        let newCart = await createCartInternal();
-        let newUser = await userManager.create({
-            name,
-            email,
-            role,
-            password,
-            cart: newCart._id,
-        });
         if (web) {
-            return response.redirect(`/login?message=User ${name} registered successfully`);
+            return response.redirect(`/login?message=User registered successfully`);
             } else {
-            response.setHeader("Content-Type", "application/json");
-            response.status(200).json({ message: "User registered successfully", newUser });
+                response.setHeader('Content-Type','application/json');
+                return response.status(201).json({payload:"Registro exitoso...!!!", user: request.user});
             }
     } catch (error) {
         response.status(500).json({
@@ -50,45 +29,32 @@ router.post("/register", async (request, response) => {
     }
 });
 
-router.post("/login", async (request, response) => {
-    let { email, password, web, role } = request.body;
-    console.log("login", request.body);
-    if (!email || !password) {
-        if (web) {
-        return response.redirect(`/login?error=Complete email, & password`);
-        } else {
-        response.setHeader("Content-Type", "application/json");
-        return response.status(400).json({ error: `Complete email, & password` });
-        }
+router.post("/login", passport.authenticate("login", {failureRedirect:"/api/sessions/error"}), async(request, response)=>{
+    let {web}=request.body
+    let user={...request.user}
+    delete user.password
+    request.session.user=user
+    if(web){
+        response.redirect("/products")
+    }else{
+        response.setHeader('Content-Type','application/json');
+        return response.status(200).json({payload:"Succesfull login", user});
     }
-    let user = await userManager.getBy({
-        email,
-        password: generateHash(password),
-    });
-    if (!user) {
-        if (web) {
-        return response.redirect(`/login?error=Invalid Credentials`);
-        } else {
-        response.setHeader("Content-Type", "application/json");
-        return response.status(400).json({ error: `Invalid Credentials` });
-        }
-    }
-  // Check if the logged in user is the admin
-    if (user.email === "adminCoder@coder.com" && password === "adminCod3r123") {
-        request.session.isAdmin = true;
-        console.log(role);
-    }
-    user = { ...user };
-    delete user.password;
-    request.session.user = user;
 
-    if (web) {
-        response.redirect("/products");
-    } else {
-        response.setHeader("Content-Type", "application/json");
-        return response.status(200).json({ payload: "Login correcto", user });
-    }
-});
+})
+
+router.get("/github", passport.authenticate("github", {}), (request, response)=>{})
+
+router.get("/callbackGithub", passport.authenticate("github", {failureRedirect:"/api/sessions/error"}), (request, response)=>{
+
+    console.log("QUERY PARAMS:",request.query)
+    request.session.user=request.user
+    console.log(request.user)
+
+    response.setHeader('Content-Type','application/json');
+    return response.status(200).json({payload:"Succesfull login", user:request.user});
+})
+
 
 router.get("/logout", (request, response) => {
     request.session.destroy((error) => {
@@ -102,7 +68,7 @@ router.get("/logout", (request, response) => {
             detalle: `${error.message}`,
             });
         }
-        response.redirect("/");
+        response.redirect("/?message=Logout successfully"); // redirect to home page
     });
 });
 

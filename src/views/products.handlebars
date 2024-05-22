@@ -3,7 +3,7 @@
     <div class="" id="">
         <ul class="">
             <li class="">
-            <a class="" href="/carts/{{user.cart}}">Shopping 🛒</a>
+            <a class="" href="/carts/{{cart._id}}">Shopping 🛒</a>
             </li>
         </ul>
     </div>
@@ -12,10 +12,10 @@
     <div class="col-md-5 p-lg-5 mx-auto my-5">
         <h1 class="display-4 font-weight-normal">Welcome {{user.name}}</h1>
         <p class="lead font-weight-normal">You've logged in with your email: {{user.email}}</p>
-        <p class="lead font-weight-normal">You're cart is waiting': {{user.cart}}</p>
-        {{#if isAdmin}}
+        <p class="lead font-weight-normal">You're cart is waiting': {{cart._id}}</p>
+        {{!-- {{#if isAdmin}} --}}
             <p class="lead font-weight-normal">You're logged in as an {{user.role}} </p>
-        {{/if}}
+        {{!-- {{/if}} --}}
     </div>
     <div class="product-device box-shadow d-none d-md-block"></div>
     <div class="product-device product-device-2 box-shadow d-none d-md-block"></div>
@@ -23,7 +23,7 @@
 <hr>
 <main>
   <div class="products-container">
-    <input type="text" value="{{{user.cart}}}" id="cart" placeholder="{{{user.cart}}}" hidden>
+    <input type="text" value="{{{cart._id}}}" id="cart" placeholder="{{{cart._id}}}" hidden>
     {{#each data}}
       <div class="product">
         <div class="product-image">

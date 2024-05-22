@@ -13,11 +13,13 @@ import { productModel } from "./dao/models/productModel.js";
 import { messagesModel } from "./dao/models/messageModel.js";
 import sessions from "express-session";
 import MongoStore from "connect-mongo";
+import { initPassport } from "./config/passportConfig.js";
+import passport from "passport";
 
 const PORT = process.env.PORT;
 const app = express();
 let serverSocket;
-
+passport
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -34,7 +36,9 @@ app.use(
     }),
   })
 );
-
+initPassport()
+app.use(passport.initialize())
+app.use(passport.session()) 
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));

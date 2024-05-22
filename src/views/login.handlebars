@@ -1,7 +1,8 @@
 {{>menu}}
 <hr>
 <body class="text-center">
-    <form class="form-signin" action="/api/sessions/login" method="post">
+    {{!-- <form class="form-signin" onsubmit="login(event)" id="formLogin" action="/api/sessions/login" method="post"> --}}
+      <form class="form-signin" action="/api/sessions/login" method="post">
         {{#if error}}
         <div style="font-weight: bolder; color: red;">{{error}}</div>
         {{/if}}
@@ -18,6 +19,9 @@
         <br>
         <button class="btn btn-lg btn-primary btn-block" type="submit" value="Login">Sign in</button>
     </form>
+    <br>
+        <a href="/api/sessions/github?web=1">Login Using Github</a>
+    <br><br>
 </body>
 
 {{!-- <script src="/js/login.js"></script> --}}

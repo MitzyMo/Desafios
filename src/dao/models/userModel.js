@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   role: { type: String, default: "user" },
-  password: { type: String, required: [true, "The Password is mandatory"] },
+  password: { type: String },
   cart: {
     type: SchemaTypes.ObjectId,
     ref: "carts",

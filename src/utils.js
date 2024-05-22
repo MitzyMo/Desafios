@@ -17,7 +17,7 @@
     
     const SECRET = "CoderCoder123";
     //export const generateHash = (password) => crypto.createHmac("sha256", SECRET).update(password).digest("hex");
-    export const generateHash=password=>bcrypt.hashSync(password, bcrypt.genSaltSync(100))
+    export const generateHash=password=>bcrypt.hashSync(password, bcrypt.genSaltSync(10))
     export const validatePassword=(password, passwordHash)=>bcrypt.compareSync(password, passwordHash)
     
     const storage = multer.diskStorage({

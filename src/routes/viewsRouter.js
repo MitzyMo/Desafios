@@ -53,9 +53,11 @@ router.get("/login", (request, response, next)=>{
   }
 });
 
+
 router.get("/profile", auth, (request, response) => {
   try {
-    response.status(200).render("profile", { user: request.session.user, login:request.session.user });
+    const user = { ...request.session.user, cart: request.session.user.cart._id }; // Extract the cart ID
+    response.status(200).render("profile", { user, login: request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -64,6 +66,11 @@ router.get("/profile", auth, (request, response) => {
   }
 });
 
+
+// Route to handle pagination and rendering
+    /* let data = await productModel.find().lean();
+let limit = request.query.limit;
+if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
 // Route to handle pagination and rendering
 router.get("/products", auth, async (request, response) => {
   try {
@@ -71,6 +78,7 @@ router.get("/products", auth, async (request, response) => {
 let limit = request.query.limit;
 if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
     // Desestructure query params
+    let cart={_id: request.session.user.cart._id}
     let { limit, page, category, status, sort } = request.query;
     if (!page) page = 1;
     if (!limit) limit = 10;
@@ -105,7 +113,7 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
       nextPage,
       styles: "main.css",
       user: request.session.user,
-      isAdmin: request.session.isAdmin,
+      cart,
       login:request.session.user
     });
   } catch (error) {
@@ -115,25 +123,22 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
     });
   }
 });
+
 //Cart View after being authenticated.
-router.get("/carts/:cid",auth, async (request, response) => {
+router.get("/carts/:cid", auth, async (request, response) => {
   try {
-    // Extract cid from request params
     const { cid } = request.params;
-
-    // Get the cart by id using the cartManager
     const cart = await cartManager.getCartById(cid);
-
-    // Render the cart view and pass the cart data
-    return response.status(200).render("cart", { cart, login:request.session.user });
+    return response.status(200).render("cart", { cart, login: request.session.user });
   } catch (error) {
-    console.error(error); // Log the error for debugging
+    console.error(error);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
     });
   }
 });
+
 
 router.get("/realtimeproducts", auth, (request, response) => {
   return response
