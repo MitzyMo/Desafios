@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import {
   createCart,
   getCartById,
@@ -7,17 +7,17 @@ import {
   deleteAllProductsFromCart,
   updateCart,
   updateProdQtyInCart
-} from "../controller/cartController.js";
-import { auth } from "../middleware/auth.js";
+} from '../controller/cartController.js';
+//import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/", auth ,createCart);
+router.post("/",createCart);
 router.get("/:cid", getCartById);
-router.post("/:cid/product/:pid", auth ,addProductToCart);
-router.delete("/:cid/product/:pid", auth ,deleteProductFromCart);
-router.delete("/:cid", auth ,deleteAllProductsFromCart);
-router.put("/:cid", auth ,updateCart);
-router.put("/:cid/product/:pid", auth ,updateProdQtyInCart);
+router.post('/:cid/product/:pid', addProductToCart);
+router.delete("/:cid/product/:pid",deleteProductFromCart);
+router.delete("/:cid" ,deleteAllProductsFromCart);
+router.put("/:cid",updateCart);
+router.put("/:cid/product/:pid" ,updateProdQtyInCart);
 
 export default router;
