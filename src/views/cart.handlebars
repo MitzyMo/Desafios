@@ -1,11 +1,11 @@
-{{>menu}}
+{{> menu}}
 <hr>
-<h2>Cart {{carts._id}}</h2>
+<h2>Cart {{cart._id}}</h2>
 
 <ul>
-    {{#each carts.productos}}
+    {{#each cart.products}}
         <li>
-            {{product.description}} - Price: {{product.price}} - quantity: {{quantity}}
+            {{this.productId.description}} - Price: {{this.productId.price}} - quantity: {{this.quantity}}
         </li>
     {{/each}}
 </ul>

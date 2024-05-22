@@ -1,5 +1,5 @@
 import express from "express";
-import 'dotenv/config';
+import "dotenv/config";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 import productRouter from "./routes/productsRouter.js";
@@ -11,19 +11,34 @@ import __dirname from "./utils.js";
 import mongoose from "mongoose";
 import { productModel } from "./dao/models/productModel.js";
 import { messagesModel } from "./dao/models/messageModel.js";
-import sessions from "express-session"
+import sessions from "express-session";
+import MongoStore from "connect-mongo";
+import { initPassport } from "./config/passportConfig.js";
+import passport from "passport";
 
 const PORT = process.env.PORT;
 const app = express();
 let serverSocket;
-
+passport
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(sessions({
-  secret:"CoderCoder123", resave:true, saveUninitialized: true
-}))
-
+app.use(
+  sessions({
+    secret: "CoderCoder123",
+    resave: true,
+    saveUninitialized: true,
+    store: MongoStore.create({
+      ttl: 3600,
+      mongoUrl: process.env.dbConnString,
+      dbName: process.env.dbName,
+      collectionName:"sessions"
+    }),
+  })
+);
+initPassport()
+app.use(passport.initialize())
+app.use(passport.session()) 
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));
@@ -31,7 +46,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
-app.use("/api/sessions", sessionRouter)
+app.use("/api/sessions", sessionRouter);
 
 const serverHTTP = app.listen(PORT, (error) => {
   if (error) {
@@ -42,11 +57,9 @@ const serverHTTP = app.listen(PORT, (error) => {
 
 const bdConnection = async () => {
   try {
-    await mongoose.connect(process.env.dbConnString,
-      {
-        dbName:process.env.dbName
-      }
-    );
+    await mongoose.connect(process.env.dbConnString, {
+      dbName: process.env.dbName,
+    });
     console.log("Mongoose online");
   } catch (error) {
     console.log("Error DB", error.message);

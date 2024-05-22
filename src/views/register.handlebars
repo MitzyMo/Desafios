@@ -1,0 +1,18 @@
+{{>menu}}
+<hr>
+<h2>Register:</h2>
+<hr>
+<form action="/api/sessions/register" method="post">
+    {{#if error}}
+        <div style="font-weight: bolder; color: red;">{{error}}</div>
+    {{/if}}
+
+    <input type="text" name="name" placeholder="name">
+    <input type="email" name="email" placeholder="e-mail">
+    <input type="password" name="password" placeholder="password">
+    <input type="text" name="web" value="web" hidden>
+
+    <br><br>
+    <input type="submit" value="Register">
+</form>
+<br><br>

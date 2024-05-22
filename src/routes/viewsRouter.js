@@ -4,35 +4,30 @@ import { CartManager } from "../dao/CartManagerDB.js";
 import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
-const prodController = new ProductManager();
-const cartController = new CartManager();
+const prodManager = new ProductManager();
+const cartManager = new CartManager();
 
 router.get("/", async (request, response) => {
+
   try {
-    response.status(200).render("home", { styles: "main.css" });
+    response.status(200).render("home", { styles: "main.css", login:request.session.user});
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
-      styles: "main.css",
+      styles: "main.css"
     });
   }
 });
 
-router.get("/register", (request, response) => {
-  try {
-    response.status(200).render("register");
-  } catch (error) {
-    response.status(500).render("error", {
-      error: "Internal Server Error",
-      styles: "main.css",
-    });
+router.get("/register", (request, response, next)=>{
+  if(request.session.user){
+    response.redirect("/profile");
   }
-});
-
-router.get("/login", (request, response) => {
+  next()
+}, (request, response) => {
   let { error } = request.query;
   try {
-    response.status(200).render("login", { error });
+    response.status(200).render("register",{error, login:request.session.user});
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -40,10 +35,29 @@ router.get("/login", (request, response) => {
     });
   }
 });
+
+router.get("/login", (request, response, next)=>{
+  if(request.session.user){
+    response.redirect("/profile");
+  }
+  next()
+},(request, response) => {
+  let { error, message } = request.query;
+  try {
+    response.status(200).render("login", { error, message, login:request.session.user });
+  } catch (error) {
+    response.status(500).render("error", {
+      error: "Internal Server Error",
+      styles: "main.css",
+    });
+  }
+});
+
 
 router.get("/profile", auth, (request, response) => {
   try {
-    response.status(200).render("profile", { user: request.session.user });
+    const user = { ...request.session.user, cart: request.session.user.cart._id }; // Extract the cart ID
+    response.status(200).render("profile", { user, login: request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -52,6 +66,11 @@ router.get("/profile", auth, (request, response) => {
   }
 });
 
+
+// Route to handle pagination and rendering
+    /* let data = await productModel.find().lean();
+let limit = request.query.limit;
+if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
 // Route to handle pagination and rendering
 router.get("/products", auth, async (request, response) => {
   try {
@@ -59,6 +78,7 @@ router.get("/products", auth, async (request, response) => {
 let limit = request.query.limit;
 if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
     // Desestructure query params
+    let cart={_id: request.session.user.cart._id}
     let { limit, page, category, status, sort } = request.query;
     if (!page) page = 1;
     if (!limit) limit = 10;
@@ -72,7 +92,7 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
       hasNextPage,
       prevPage,
       nextPage,
-    } = await prodController.getProductsPaginate(
+    } = await prodManager.getProductsPaginate(
       limit,
       page,
       category,
@@ -93,7 +113,8 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
       nextPage,
       styles: "main.css",
       user: request.session.user,
-      isAdmin: request.session.isAdmin,
+      cart,
+      login:request.session.user
     });
   } catch (error) {
     response.status(500).render("error", {
@@ -103,30 +124,30 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
   }
 });
 
-//Hardcode Get cart
+//Cart View after being authenticated.
 router.get("/carts/:cid", auth, async (request, response) => {
   try {
-    console.log("testing");
-    let cart = await cartController.getCartById(request, response);
-    console.log("cart", cart);
-    response.setHeader("Content-Type", "text/html");
-    return response.status(200).render("cart", { cart });
+    const { cid } = request.params;
+    const cart = await cartManager.getCartById(cid);
+    return response.status(200).render("cart", { cart, login: request.session.user });
   } catch (error) {
+    console.error(error);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
     });
   }
 });
+
 
 router.get("/realtimeproducts", auth, (request, response) => {
   return response
     .status(200)
-    .render("realTimeProducts", { styles: "main.css" });
+    .render("realTimeProducts", { styles: "main.css", login:request.session.user });
 });
 
-router.get("/chat", (request, response) => {
-  return response.status(200).render("chat", { styles: "main.css" });
+router.get("/chat", auth, (request, response) => {
+  return response.status(200).render("chat", { styles: "main.css", login:request.session.user });
 });
 
 export default router;

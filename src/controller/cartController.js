@@ -1,12 +1,23 @@
 import { CartManager } from "../dao/CartManagerDB.js";
 const manager = new CartManager();
 
+// Separate function for internal use
+export const createCartInternal = async () => {
+  try {
+      const cart = await manager.createCart();
+      return cart;
+  } catch (error) {
+      throw error;  // Ensure to throw error for internal calls
+  }
+};
+
+// External API function
 export const createCart = async (req, res) => {
   try {
-    const cart = await manager.createCart();
-    res.status(201).json({ cart });
+      const cart = await manager.createCart();
+      res.status(201).json({ cart });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
   }
 };
 

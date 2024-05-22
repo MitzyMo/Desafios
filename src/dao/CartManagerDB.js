@@ -3,12 +3,16 @@ import { cartModel } from "../dao/models/cartModel.js";
 export class CartManager {
   async getCartById(cid) {
     try {
-      const cart = await cartModel.findById(cid).populate('products.productId');
+      const cart = await cartModel.findById(cid).populate('products.productId').lean();
+      if (!cart) {
+        throw new Error(`Cart with id ${cid} not found.`);
+      }
       return cart;
     } catch (error) {
       throw new Error(`Cart with id ${cid} not found.`);
     }
   }
+  
 
   async createCart() {
     try {
