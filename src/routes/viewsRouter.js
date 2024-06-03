@@ -7,10 +7,10 @@ const router = express.Router();
 const prodManager = new ProductManager();
 const cartManager = new CartManager();
 
+// Home Route
 router.get("/", async (request, response) => {
-
   try {
-    response.status(200).render("home", { styles: "main.css", login:request.session.user});
+    response.status(200).render("home", { styles: "main.css", login: request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -19,15 +19,17 @@ router.get("/", async (request, response) => {
   }
 });
 
-router.get("/register", (request, response, next)=>{
-  if(request.session.user){
+// Register Route
+router.get("/register", (request, response, next) => {
+  if (request.session.user) {
     response.redirect("/profile");
+  } else {
+    next();
   }
-  next()
 }, (request, response) => {
   let { error } = request.query;
   try {
-    response.status(200).render("register",{error, login:request.session.user});
+    response.status(200).render("register", { error, login: request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -36,15 +38,17 @@ router.get("/register", (request, response, next)=>{
   }
 });
 
-router.get("/login", (request, response, next)=>{
-  if(request.session.user){
+// Login Route
+router.get("/login", (request, response, next) => {
+  if (request.session.user) {
     response.redirect("/profile");
+  } else {
+    next();
   }
-  next()
-},(request, response) => {
+}, (request, response) => {
   let { error, message } = request.query;
   try {
-    response.status(200).render("login", { error, message, login:request.session.user });
+    response.status(200).render("login", { error, message, login: request.session.user });
   } catch (error) {
     response.status(500).render("error", {
       error: "Internal Server Error",
@@ -53,7 +57,7 @@ router.get("/login", (request, response, next)=>{
   }
 });
 
-
+// Profile Route
 router.get("/profile", auth, (request, response) => {
   try {
     const user = { ...request.session.user, cart: request.session.user.cart._id }; // Extract the cart ID
@@ -66,25 +70,15 @@ router.get("/profile", auth, (request, response) => {
   }
 });
 
-
-// Route to handle pagination and rendering
-    /* let data = await productModel.find().lean();
-let limit = request.query.limit;
-if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
-// Route to handle pagination and rendering
+// Products Route
 router.get("/products", auth, async (request, response) => {
   try {
-    /* let data = await productModel.find().lean();
-let limit = request.query.limit;
-if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
-    // Desestructure query params
-    let cart={_id: request.session.user.cart._id}
+    let cart = { _id: request.session.user.cart._id };
     let { limit, page, category, status, sort } = request.query;
     if (!page) page = 1;
     if (!limit) limit = 10;
     if (!category) category = "null";
     if (!sort) sort = "asc";
-    // Get products with pagination, category filter, and sorting
     let {
       docs: data,
       totalPages,
@@ -114,7 +108,7 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
       styles: "main.css",
       user: request.session.user,
       cart,
-      login:request.session.user
+      login: request.session.user
     });
   } catch (error) {
     response.status(500).render("error", {
@@ -124,7 +118,7 @@ if (Number(limit) && limit > 0) {data = data.slice(0, limit);} */
   }
 });
 
-//Cart View after being authenticated.
+// Cart Route
 router.get("/carts/:cid", auth, async (request, response) => {
   try {
     const { cid } = request.params;
@@ -139,15 +133,16 @@ router.get("/carts/:cid", auth, async (request, response) => {
   }
 });
 
-
+// Real-time Products Route
 router.get("/realtimeproducts", auth, (request, response) => {
   return response
     .status(200)
-    .render("realTimeProducts", { styles: "main.css", login:request.session.user });
+    .render("realTimeProducts", { styles: "main.css", login: request.session.user });
 });
 
+// Chat Route
 router.get("/chat", auth, (request, response) => {
-  return response.status(200).render("chat", { styles: "main.css", login:request.session.user });
+  return response.status(200).render("chat", { styles: "main.css", login: request.session.user });
 });
 
 export default router;
