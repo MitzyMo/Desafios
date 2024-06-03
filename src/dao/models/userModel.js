@@ -1,24 +1,28 @@
 import mongoose, { SchemaTypes } from "mongoose";
-
 const collectionName = "users";
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: [true, "Your name is Mandatory"] },
+  firstName: { type: String, required: [true, "Your first name is mandatory"] },
+  lastName: { type: String, required: [true, "Your last name is mandatory"] },
   email: {
     type: String,
-    required: [true, "The Code is mandatory and must be unique"],
+    required: [true, "The email is mandatory and must be unique"],
     unique: true,
   },
-  role: { type: String, default: "user" },
-  password: { type: String },
+  age: { type: String },
+  password: { type: String, required: true },
   cart: {
     type: SchemaTypes.ObjectId,
     ref: "carts",
   },
+  role: { type: String, default: "user" },
 });
+
 userSchema.set("toJSON", {
   transform: function (document, retorno) {
     delete retorno.__v;
+    delete retorno.password;
     return retorno;
   },
 });
+
 export const userModel = mongoose.model(collectionName, userSchema);
