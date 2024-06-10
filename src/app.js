@@ -1,5 +1,4 @@
 import express from "express";
-import "dotenv/config";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
 import productRouter from "./routes/productsRouter.js";
@@ -15,8 +14,9 @@ import sessions from "express-session";
 import MongoStore from "connect-mongo";
 import { initPassport } from "./config/passportConfig.js";
 import passport from "passport";
+import { config } from "./config/config.js";
 
-const PORT = process.env.PORT;
+const PORT = config.PORT;
 const app = express();
 let serverSocket;
 passport
@@ -25,13 +25,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   sessions({
-    secret: "CoderCoder123",
+    secret: config.UTIL_SECRET,
     resave: true,
     saveUninitialized: true,
     store: MongoStore.create({
       ttl: 3600,
-      mongoUrl: process.env.dbConnString,
-      dbName: process.env.dbName,
+      mongoUrl: config.MONGO_URL,
+      dbName: config.DB_NAME,
       collectionName:"sessions"
     }),
   })
@@ -57,8 +57,8 @@ const serverHTTP = app.listen(PORT, (error) => {
 
 const bdConnection = async () => {
   try {
-    await mongoose.connect(process.env.dbConnString, {
-      dbName: process.env.dbName,
+    await mongoose.connect(config.MONGO_URL, {
+      dbName: config.DB_NAME,
     });
     console.log("Mongoose online");
   } catch (error) {
