@@ -1,4 +1,15 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+
+const ENVIRONMENTS = ['development', 'production'];
+const currentEnv = process.env.NODE_ENV || 'development';
+
+if (!ENVIRONMENTS.includes(currentEnv)) {
+  throw new Error(`Invalid NODE_ENV: ${currentEnv}. Valid environments are ${ENVIRONMENTS.join(', ')}.`);
+}
+
+const envFile = currentEnv === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: envFile });
+console.log('Validating ENV passed: ',currentEnv);
 
 export const config = {
   PORT: process.env.PORT,
