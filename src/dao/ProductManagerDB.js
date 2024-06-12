@@ -1,4 +1,4 @@
-import { productModel } from "./models/productModel.js";
+import { productModel } from "../dao/models/productModel.js";
 
 export class ProductManager {
   async getProducts(limit) {
@@ -35,7 +35,6 @@ export class ProductManager {
       return { error: "Internal Server Error" };
     }
   }
-  
 
   async getProductById(pid) {
     try {

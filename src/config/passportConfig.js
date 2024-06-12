@@ -3,8 +3,8 @@ import local from "passport-local";
 import github from "passport-github2";
 import { UserManager } from "../dao/UserManagerDB.js";
 import { generateHash, validatePassword } from "../utils.js";
-import { createCartInternal } from "../controller/cartController.js";
 import { config } from "./config.js";
+import { CartService } from "../services/CartService.js";
 
 const userManager = new UserManager();
 
@@ -26,7 +26,7 @@ export const initPassport = () => {
           }
           let user = await userManager.getByPopulate({ email });
           if (!user) {
-            let newCart = await createCartInternal();
+            let newCart = await CartService.createCartInternal();
             user = await userManager.create({
               firstName: name,
               lastName: name,
@@ -60,7 +60,7 @@ export const initPassport = () => {
           if (exists) {
             return done(null, false);
           }
-          let newCart = await createCartInternal();
+          let newCart = await CartService.createCartInternal();
           password = generateHash(password);
           let user = await userManager.create({
             firstName,

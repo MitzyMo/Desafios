@@ -1,7 +1,7 @@
 import serverSocket from "../app.js";
-import { ProductManager } from "../dao/ProductManagerDB.js";
+import { ProductService } from "../services/ProductService.js";
 
-const manager = new ProductManager();
+const manager = new ProductService();
 
 export const getProducts = async (req, res) => {
   try {
