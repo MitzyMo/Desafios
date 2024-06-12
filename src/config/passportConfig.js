@@ -1,10 +1,10 @@
 import passport from "passport";
-import "dotenv/config";
 import local from "passport-local";
 import github from "passport-github2";
 import { UserManager } from "../dao/UserManagerDB.js";
 import { generateHash, validatePassword } from "../utils.js";
-import { createCartInternal } from "../controller/cartController.js";
+import { config } from "./config.js";
+import { CartService } from "../services/CartService.js";
 
 const userManager = new UserManager();
 
@@ -13,8 +13,8 @@ export const initPassport = () => {
     "github",
     new github.Strategy(
       {
-        clientID: process.env.clientID,
-        clientSecret: process.env.clientSecret,
+        clientID: config.CLIENT_ID,
+        clientSecret: config.CLIENT_SECRET,
         callbackURL: "http://localhost:3000/api/sessions/callbackGithub",
       },
       async (accessToken, refreshToken, profile, done) => {
@@ -26,7 +26,7 @@ export const initPassport = () => {
           }
           let user = await userManager.getByPopulate({ email });
           if (!user) {
-            let newCart = await createCartInternal();
+            let newCart = await CartService.createCartInternal();
             user = await userManager.create({
               firstName: name,
               lastName: name,
@@ -60,7 +60,7 @@ export const initPassport = () => {
           if (exists) {
             return done(null, false);
           }
-          let newCart = await createCartInternal();
+          let newCart = await CartService.createCartInternal();
           password = generateHash(password);
           let user = await userManager.create({
             firstName,
@@ -95,7 +95,7 @@ export const initPassport = () => {
           if (!validatePassword(password, user.password)) {
             return done(null, false);
           }
-          if (user.email === "adminCoder@coder.com" && password === "adminCod3r123") {
+          if (user.email === config.ADMIN_USER && password === config.ADMIN_PASSWORD) {
             request.session.isAdmin = true;
             user.role = 'admin';
           } else {

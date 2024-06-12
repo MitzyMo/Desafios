@@ -6,3 +6,9 @@
 3. Ejecutar el comando `npm run dev`
 4. Abrir el navegador en la dirección `http://localhost:3000`
 5. actualizar las variables de `PORT` y `dbConnString`
+
+## ENVIRONMENTS
+
+These can be run: 
+* npm run dev: development
+* npm run prod: production
