@@ -1,15 +1,59 @@
 {{> menu}}
 <hr>
-<h2>Cart {{cart._id}}</h2>
+<h2>Cart</h2>
+<input type="text" value="{{cart._id}}" hidden id="cartValue">
 
-<ul>
-    {{#each cart.products}}
-        <li>
-            {{this.productId.description}} - Price: {{this.productId.price}} - quantity: {{this.quantity}}
-        </li>
-    {{/each}}
-</ul>
+<div style="display: flex; justify-content: flex-end;">
+    <button onclick="clearCart('{{cart._id}}')" class="btn btn-outline-danger">Clear Cart</button>
+</div>
+<br>
+<table style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr>
+            <th style="padding: 10px;">Title & Description</th>
+            <th style="padding: 10px;">Code</th>
+            <th style="padding: 10px;">Stock</th>
+            <th style="padding: 10px;">Quantity</th>
+            <th style="padding: 10px;">Price/Unit</th>
+            <th style="padding: 10px;">Actions</th>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <hr>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each cart.products}}
+        <tr>
+            <td style="padding: 10px;">
+                <div><strong>{{this.productId.title}}</strong></div>
+                <div>{{this.productId.description}}</div>
+            </td>
+            <td style="padding: 10px;">{{this.productId.code}}</td>
+            <td style="padding: 10px;">{{this.productId.stock}}</td>
+            <td style="padding: 10px;">
+                <div style="display: flex; align-items: center;">
+                    <button onclick="decreaseProd('{{this.productId._id}}')" class="btn btn-outline-danger">-</button>
+                    <div style="margin: 0 10px;" id="prodQuantity-{{this.productId._id}}">{{quantity}}</div>
+                    <button onclick="increaseProd('{{this.productId._id}}')" class="btn btn-outline-success">+</button>
+                </div>
+            </td>
+            <td style="padding: 10px;">${{this.productId.price}}</td>
+            <td style="padding: 10px;">
+                <button onclick="deleteProd('{{this.productId._id}}')" class="btn btn-outline-danger">🗑️</button>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
 
 <br>
 <br>
-<a href="/products">Keep Shopping</a>
+<a class="btn btn-outline-primary" href="/products">Keep Shopping</a>
+
+<div style="display: flex; justify-content: flex-end;">
+<button onclick="purchase()" class="btn btn-outline-primary">Comprar</button>
+</div>
+
+<script src="/js/carts.js"></script>

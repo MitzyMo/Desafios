@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import { UserManager } from "../dao/UserManagerDB.js";
+import { UserDTO } from "../DTO/UserDTO.js";
 export const router = Router();
 
 const userManager = new UserManager();
@@ -84,7 +85,7 @@ router.get("/current", (request, response) => {
       return response.status(401).json({ error: "No authenticated user" });
     }
     // Respond with relevant user data (excluding password)
-    const user = { ...request.session.user };
+    const user = new UserDTO(request.user );
     delete user.password;
     response.status(200).json({ user });
   });
