@@ -1,7 +1,9 @@
 import express from "express";
+import passport from "passport";
 import { ProductManager } from "../dao/ProductManagerDB.js";
 import { CartManager } from "../dao/CartManagerDB.js";
 import { auth } from "../middleware/auth.js";
+import { sendRegistrationEmail } from "../services/MailService.js";
 
 const router = express.Router();
 const prodManager = new ProductManager();
@@ -37,6 +39,28 @@ router.get("/register", (request, response, next) => {
     });
   }
 });
+//RegiterEmail
+router.post("/register",passport.authenticate("register", { failureRedirect: "/api/sessions/error" }),
+  async (request, response) => {
+    let { web } = request.body;
+    try {
+      // Send registration email
+      await sendRegistrationEmail(request.user.email);
+
+      if (web) {
+        return response.redirect(`/login?message=User registered successfully`);
+      } else {
+        response.setHeader("Content-Type", "application/json");
+        return response.status(201).json({ payload: "Registration successful...!!!", user: request.user });
+      }
+    } catch (error) {
+      response.status(500).json({
+        error: `Unexpected error, contact your administrator`,
+        detail: `${error.message}`,
+      });
+    }
+  }
+);
 
 // Login Route
 router.get("/login", (request, response, next) => {
