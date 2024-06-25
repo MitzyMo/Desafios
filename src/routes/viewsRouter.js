@@ -4,6 +4,7 @@ import { ProductManager } from "../dao/ProductManagerDB.js";
 import { CartManager } from "../dao/CartManagerDB.js";
 import { auth } from "../middleware/auth.js";
 import { sendRegistrationEmail } from "../services/MailService.js";
+import { authRole } from "../middleware/authRole.js";
 
 const router = express.Router();
 const prodManager = new ProductManager();
@@ -143,7 +144,7 @@ router.get("/products", auth, async (request, response) => {
 });
 
 // Cart Route
-router.get("/carts/:cid", auth, async (request, response) => {
+router.get("/carts/:cid", authRole('user'), async (request, response) => {
   try {
     const { cid } = request.params;
     const cart = await cartManager.getCartById(cid);

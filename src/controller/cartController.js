@@ -106,8 +106,17 @@ export const purchaseCart = async (request, response) => {
                 newCart.push({product:prod.product._id, quantity:prod.quantity})
             }
         }
-        productsInStock=productsInStock.map(product=>new )
-        productsOutOfStock=productsOutOfStock.map(product=>new )
+        productsInStock = productsInStock.map(product => ({
+            productId: product.product._id,
+            quantity: product.quantity,
+            price: product.product.price,
+        }));
+        
+        productsOutOfStock = productsOutOfStock.map(product => ({
+            productId: product.product._id,
+            quantity: product.quantity,
+            message: "Out of stock"
+        }));
         
     } catch (error) {
         response.status(500).json({ error: error.message });
