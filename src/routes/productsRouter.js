@@ -7,15 +7,15 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controller/productController.js";
-//import { auth } from "../middleware/auth.js";
+import { authRole } from "../middleware/authRole.js";
 
 const router = express.Router();
 
 router.get("/",getProducts);
 router.get("/paginate",getProductsPaginate);
 router.get("/:pid",getProductById);
-router.post("/",addProduct);
-router.put("/:pid",updateProduct);
-router.delete("/:pid",deleteProduct);
+router.post("/",authRole('admin'),addProduct);
+router.put("/:pid",authRole('admin'),updateProduct);
+router.delete("/:pid",authRole('admin'),deleteProduct);
 
 export default router;

@@ -117,6 +117,13 @@ export const purchaseCart = async (request, response) => {
             quantity: product.quantity,
             message: "Out of stock"
         }));
+
+        let newTicket = null
+        if(productsInStock.length>0){
+            let code = user.cart._id+'-'+Math.random().toString(36).substring(2, 15).toUpperCase()
+            let purchaser = user.email
+            newTicket = await ticketService.createTicket({code, amount, purchaser})
+        }
         
     } catch (error) {
         response.status(500).json({ error: error.message });

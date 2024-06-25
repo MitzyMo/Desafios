@@ -41,7 +41,7 @@ router.get("/register", (request, response, next) => {
   }
 });
 //RegiterEmail
-router.post("/register",passport.authenticate("register", { failureRedirect: "/api/sessions/error" }),
+router.post("/register", passport.authenticate("register", { failureRedirect: "/api/sessions/error" }),
   async (request, response) => {
     let { web } = request.body;
     try {
@@ -166,7 +166,7 @@ router.get("/realtimeproducts", auth, (request, response) => {
 });
 
 // Chat Route
-router.get("/chat", auth, (request, response) => {
+router.get("/chat", authRole('user'), (request, response) => {
   return response.status(200).render("chat", { styles: "main.css", login: request.session.user });
 });
 

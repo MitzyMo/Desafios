@@ -8,15 +8,14 @@ import {
  updateCart,
  updateProdQtyInCart
 } from '../controller/cartController.js';
-//import { auth } from "../middleware/auth.js";
-
+import { authRole } from '../middleware/authRole.js';
 
 const router = express.Router();
 
 
 router.post("/",createCart);
 router.get("/:cid", getCartById);
-router.post('/:cid/product/:pid', addProductToCart);
+router.post('/:cid/product/:pid',authRole('user'), addProductToCart);
 router.delete("/:cid/product/:pid",deleteProductFromCart);
 router.delete("/:cid" ,deleteAllProductsFromCart);
 router.put("/:cid",updateCart);
