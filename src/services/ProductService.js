@@ -36,6 +36,7 @@ export class ProductService {
   async updateProduct(pid, updatedProduct) {
     try {
       return await manager.updateProduct(pid, updatedProduct);
+      
     } catch (error) {
       throw new Error(`Product with id ${pid} was not found.`);
     }

@@ -1,7 +1,8 @@
 const cid = document.getElementById("cartValue").value;
-console.log(cid);
+console.log('Cart',cid);
 
 const purchase = async() => {
+    console.log('Product',cid);
 
   let response=await fetch(`/api/carts/${cid}/purchase`,{
       method:"post"
