@@ -1,7 +1,10 @@
 import express from "express";
+import passport from "passport";
 import { ProductManager } from "../dao/ProductManagerDB.js";
 import { CartManager } from "../dao/CartManagerDB.js";
 import { auth } from "../middleware/auth.js";
+import { sendRegistrationEmail } from "../services/MailService.js";
+import { authRole } from "../middleware/authRole.js";
 
 const router = express.Router();
 const prodManager = new ProductManager();
@@ -37,6 +40,28 @@ router.get("/register", (request, response, next) => {
     });
   }
 });
+//RegiterEmail
+router.post("/register", passport.authenticate("register", { failureRedirect: "/api/sessions/error" }),
+  async (request, response) => {
+    let { web } = request.body;
+    try {
+      // Send registration email
+      await sendRegistrationEmail(request.user.email);
+
+      if (web) {
+        return response.redirect(`/login?message=User registered successfully`);
+      } else {
+        response.setHeader("Content-Type", "application/json");
+        return response.status(201).json({ payload: "Registration successful...!!!", user: request.user });
+      }
+    } catch (error) {
+      response.status(500).json({
+        error: `Unexpected error, contact your administrator`,
+        detail: `${error.message}`,
+      });
+    }
+  }
+);
 
 // Login Route
 router.get("/login", (request, response, next) => {
@@ -119,7 +144,7 @@ router.get("/products", auth, async (request, response) => {
 });
 
 // Cart Route
-router.get("/carts/:cid", auth, async (request, response) => {
+router.get("/carts/:cid", authRole('user'), async (request, response) => {
   try {
     const { cid } = request.params;
     const cart = await cartManager.getCartById(cid);
@@ -141,7 +166,7 @@ router.get("/realtimeproducts", auth, (request, response) => {
 });
 
 // Chat Route
-router.get("/chat", auth, (request, response) => {
+router.get("/chat", authRole('user'), (request, response) => {
   return response.status(200).render("chat", { styles: "main.css", login: request.session.user });
 });
 

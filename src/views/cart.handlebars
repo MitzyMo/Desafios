@@ -53,7 +53,7 @@
 <a class="btn btn-outline-primary" href="/products">Keep Shopping</a>
 
 <div style="display: flex; justify-content: flex-end;">
-<button onclick="purchase()" class="btn btn-outline-primary">Comprar</button>
+    <a onclick="purchase()" class="btn btn-outline-primary" href="/api/carts/{{{cart._id}}}/purchase">Proceed to Purchase</a>
 </div>
 
-<script src="/js/carts.js"></script>
+<script src="/js/cart.js"></script>
