@@ -1,6 +1,7 @@
 import mongoose, { SchemaTypes } from "mongoose";
 
 const collectionName = "tickets";
+
 const ticketSchema = new mongoose.Schema({
   code: {type: String, unique: true, required: true},
   purchase_datetime: {type: Date, required: true, default: Date.now},
