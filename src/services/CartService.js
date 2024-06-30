@@ -63,5 +63,13 @@ export const CartService = {
         } catch (error) {
             throw error;
         }
+    },
+    async createCartInternal() {
+        try {
+            const cart = await manager.createCart();
+            return cart;
+        } catch (error) {
+            throw error;
+        }
     }
 };
