@@ -1,5 +1,6 @@
 import serverSocket from "../app.js";
 import { ProductService } from "../services/ProductService.js";
+import { CustomError, errorDictionary } from "../middleware/errorHandler.js"
 
 const manager = new ProductService();
 
@@ -9,7 +10,7 @@ export const getProducts = async (req, res) => {
     const { totalProducts, data } = await manager.getProducts(limit);
     res.json({ totalProducts, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Error fetching products." });
   }
 };
 
@@ -54,6 +55,30 @@ export const addProduct = async (req, res) => {
     res.status(201).json({ product: newProduct });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+export const createProduct = async (req, res, next) => {
+  try {
+    const { title, price } = req.body;
+
+    if (!title) {
+      throw new CustomError(errorDictionary.PRODUCT_CREATION.MISSING_TITLE, 400);
+    }
+
+    if (price === undefined) {
+      throw new CustomError(errorDictionary.PRODUCT_CREATION.MISSING_PRICE, 400);
+    }
+
+    if (isNaN(price)) {
+      throw new CustomError(errorDictionary.PRODUCT_CREATION.INVALID_PRICE, 400);
+    }
+
+    const newProduct = req.body;
+    const result = await productModel.create(newProduct);
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
   }
 };
 
