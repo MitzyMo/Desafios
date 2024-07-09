@@ -3,7 +3,7 @@
     import multer from "multer"
     import bcrypt from "bcrypt"
     import nodemailer from 'nodemailer'
-import { config } from './config/config.js';
+    import { config } from './config/config.js';
 
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
@@ -49,3 +49,4 @@ export const email = async(to, subject, html) => {
     )
 
 }
+

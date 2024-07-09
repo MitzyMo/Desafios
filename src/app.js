@@ -1,3 +1,4 @@
+
 import express from "express";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
@@ -15,11 +16,15 @@ import MongoStore from "connect-mongo";
 import { initPassport } from "./config/passportConfig.js";
 import passport from "passport";
 import { config } from "./config/config.js";
+import logger, { middlewareLogger } from "./middleware/logger.js";
+
 
 const PORT = config.PORT;
 const app = express();
 let serverSocket;
-passport
+
+
+app.use(middlewareLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -32,13 +37,13 @@ app.use(
       ttl: 3600,
       mongoUrl: config.MONGO_URL,
       dbName: config.DB_NAME,
-      collectionName:"sessions"
+      collectionName: "sessions",
     }),
   })
 );
-initPassport()
-app.use(passport.initialize())
-app.use(passport.session()) 
+initPassport();
+app.use(passport.initialize());
+app.use(passport.session());
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));
@@ -50,9 +55,10 @@ app.use("/api/sessions", sessionRouter);
 
 const serverHTTP = app.listen(PORT, (error) => {
   if (error) {
+    logger.fatal("Failed to start the server:", error);
     throw new Error("Failed to start the server:", error);
   }
-  return console.log(`Server connected in port ${PORT}`);
+  logger.info(`Server connected on port ${PORT}`);
 });
 
 const bdConnection = async () => {
@@ -60,9 +66,9 @@ const bdConnection = async () => {
     await mongoose.connect(config.MONGO_URL, {
       dbName: config.DB_NAME,
     });
-    console.log("Mongoose online");
+    logger.info("Mongoose connected");
   } catch (error) {
-    console.log("Error DB", error.message);
+    logger.error("Error connecting to the database", error.message);
   }
 };
 
@@ -71,13 +77,13 @@ bdConnection();
 serverSocket = new Server(serverHTTP);
 
 serverSocket.on("connection", async (socket) => {
-  console.log(`Client with id ${socket.id}`);
+  logger.info(`Client connected with id ${socket.id}`);
   const products = await productModel.find();
   socket.emit("products", products);
 
   let users = [];
 
-  console.log(`User with id: ${socket.id}`);
+  logger.info(`User connected with id: ${socket.id}`);
 
   socket.on("id", async (name) => {
     users.push({ id: socket.id, name });
@@ -95,9 +101,8 @@ serverSocket.on("connection", async (socket) => {
   });
 });
 
-// Consolidate "exit" event listeners into a single listener
 process.on("exit", (code) => {
-  console.log(`Process exiting with code ${code}`);
+  logger.info(`Process exiting with code ${code}`);
   // Clean up resources, if necessary
 });
 

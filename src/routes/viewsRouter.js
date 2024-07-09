@@ -13,8 +13,12 @@ const cartManager = new CartManager();
 // Home Route
 router.get("/", async (request, response) => {
   try {
+    request.logger.info('Accessed Home Route');
+    request.logger.debug('TEST DEBUGAccessed Home Route');
+    request.logger.error('Test Accessed Home Route');
     response.status(200).render("home", { styles: "main.css", login: request.session.user });
   } catch (error) {
+    request.logger.error(`Error on Home Route: ${error.message}`);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css"
@@ -34,13 +38,15 @@ router.get("/register", (request, response, next) => {
   try {
     response.status(200).render("register", { error, login: request.session.user });
   } catch (error) {
+    request.logger.error(`Error on Register Route (GET): ${error.message}`);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
     });
   }
 });
-//RegiterEmail
+
+// Register Email
 router.post("/register", passport.authenticate("register", { failureRedirect: "/api/sessions/error" }),
   async (request, response) => {
     let { web } = request.body;
@@ -55,6 +61,7 @@ router.post("/register", passport.authenticate("register", { failureRedirect: "/
         return response.status(201).json({ payload: "Registration successful...!!!", user: request.user });
       }
     } catch (error) {
+      request.logger.error(`Error on Register Route (POST): ${error.message}`);
       response.status(500).json({
         error: `Unexpected error, contact your administrator`,
         detail: `${error.message}`,
@@ -75,6 +82,7 @@ router.get("/login", (request, response, next) => {
   try {
     response.status(200).render("login", { error, message, login: request.session.user });
   } catch (error) {
+    request.logger.error(`Error on Login Route (GET): ${error.message}`);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
@@ -88,6 +96,7 @@ router.get("/profile", auth, (request, response) => {
     const user = { ...request.session.user, cart: request.session.user.cart._id }; // Extract the cart ID
     response.status(200).render("profile", { user, login: request.session.user });
   } catch (error) {
+    request.logger.error(`Error on Profile Route: ${error.message}`);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
@@ -136,6 +145,7 @@ router.get("/products", auth, async (request, response) => {
       login: request.session.user
     });
   } catch (error) {
+    request.logger.error(`Error on Products Route: ${error.message}`);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
@@ -150,7 +160,7 @@ router.get("/carts/:cid", authRole('user'), async (request, response) => {
     const cart = await cartManager.getCartById(cid);
     return response.status(200).render("cart", { cart, login: request.session.user });
   } catch (error) {
-    console.error(error);
+    request.logger.error(`Error on Cart Route: ${error.message}`);
     response.status(500).render("error", {
       error: "Internal Server Error",
       styles: "main.css",
@@ -160,14 +170,32 @@ router.get("/carts/:cid", authRole('user'), async (request, response) => {
 
 // Real-time Products Route
 router.get("/realtimeproducts", auth, (request, response) => {
-  return response
-    .status(200)
-    .render("realTimeProducts", { styles: "main.css", login: request.session.user });
+  try {
+    request.logger.info('Accessed Real-time Products Route');
+    return response
+      .status(200)
+      .render("realTimeProducts", { styles: "main.css", login: request.session.user });
+  } catch (error) {
+    request.logger.error(`Error on Real-time Products Route: ${error.message}`);
+    response.status(500).render("error", {
+      error: "Internal Server Error",
+      styles: "main.css",
+    });
+  }
 });
 
 // Chat Route
 router.get("/chat", authRole('user'), (request, response) => {
-  return response.status(200).render("chat", { styles: "main.css", login: request.session.user });
+  try {
+    request.logger.info('Accessed Chat Route');
+    return response.status(200).render("chat", { styles: "main.css", login: request.session.user });
+  } catch (error) {
+    request.logger.error(`Error on Chat Route: ${error.message}`);
+    response.status(500).render("error", {
+      error: "Internal Server Error",
+      styles: "main.css",
+    });
+  }
 });
 
 export default router;
