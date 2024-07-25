@@ -13,4 +13,12 @@ export class UserManager{
     async getByPopulate(filter={}){
         return await userModel.findOne(filter).populate("cart").lean()
     }
+    async update(id, hashPassword) {
+
+      return await usersModel.findByIdAndUpdate(id, {password: hashPassword}, { runValidators: true, returnDocument: "after" })
+  }
+
+    async updateRole(id, newRole) {
+      return await usersModel.findByIdAndUpdate(id, {role: newRole}, { runValidators: true, returnDocument: "after" })
+  }
 }

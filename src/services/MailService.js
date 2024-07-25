@@ -1,4 +1,3 @@
-// src/services/mailService.js
 import nodemailer from 'nodemailer';
 import { config } from '../config/config.js';
 

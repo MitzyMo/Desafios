@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { UserManager } from "../dao/UserManagerDB.js";
-import { generateHash, validatePassword } from "../utils.js";
+import { generateHash, validatePassword } from "../utils/utils.js";
 import { createCartInternal } from "../controller/cartController.js";
 export const router = Router();
 

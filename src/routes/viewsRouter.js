@@ -1,10 +1,12 @@
 import express from "express";
 import passport from "passport";
+import jwt from "jsonwebtoken"
 import { ProductManager } from "../dao/ProductManagerDB.js";
 import { CartManager } from "../dao/CartManagerDB.js";
 import { auth } from "../middleware/auth.js";
 import { sendRegistrationEmail } from "../services/MailService.js";
 import { authRole } from "../middleware/authRole.js";
+import { config } from "../config/config.js";
 
 const router = express.Router();
 const prodManager = new ProductManager();
@@ -154,7 +156,7 @@ router.get("/products", auth, async (request, response) => {
 });
 
 // Cart Route
-router.get("/carts/:cid", authRole('user'), async (request, response) => {
+router.get("/carts/:cid", authRole(['user', 'premium']), async (request, response) => {
   try {
     const { cid } = request.params;
     const cart = await cartManager.getCartById(cid);
@@ -185,7 +187,7 @@ router.get("/realtimeproducts", auth, (request, response) => {
 });
 
 // Chat Route
-router.get("/chat", authRole('user'), (request, response) => {
+router.get("/chat", authRole(['user', 'premium']), (request, response) => {
   try {
     request.logger.info('Accessed Chat Route');
     return response.status(200).render("chat", { styles: "main.css", login: request.session.user });
@@ -197,5 +199,48 @@ router.get("/chat", authRole('user'), (request, response) => {
     });
   }
 });
+
+//Forgot Password
+router.get("/forgot-password", (request, response) => {
+  try {
+    request.logger.debug('Accessed forgot-password');
+    return response.status(200).render("forgot-Password", { styles: "main.css" });
+  } catch (error) {
+    request.logger.error(`Error on accessing recovery password flow: ${error.message}`);
+    response.status(500).render("error", {
+      error: "Internal Server Error",
+      styles: "main.css",
+    });
+  }
+});
+
+//Get new hassed password.
+router.get("/newPassword/:token", (request, response) => {
+  //Retrieve Token
+  let token = req.params.token
+ // Validate Token
+  let decodedToken
+  try {
+      decodedToken = jwt.verify(token, config.SECRETJWT);
+      request.logger.debug('Accessed forgot-password',decodedToken);
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        request.logger.info('Accessed forgot-password',decodedToken);
+      } else if (error.name === 'JsonWebTokenError') {
+        request.logger.info('Accessed forgot-password',decodedToken);
+      } else {
+        request.logger.error('Accessed forgot-password',error);
+      }
+    }
+    //Re direct based on token's validation.
+    if (decodedToken) {
+        res.setHeader("Content-Type", "text/html")
+        return res.status(200).render("newPassword", decodedToken)
+    } else {
+      res.setHeader("Content-Type", "text/html")
+      res.status(400).render("login", {message: "Either the token expired or is incorrect, you should request a new password reset email." })
+  }
+}
+);
 
 export default router;

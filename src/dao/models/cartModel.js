@@ -1,6 +1,7 @@
 import mongoose, { SchemaTypes } from "mongoose";
 
 const collectionName = "carts";
+
 const cartSchema = new mongoose.Schema({
   products: [  
     {

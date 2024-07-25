@@ -1,6 +1,6 @@
 import winston from 'winston';
 import path from 'path';
-import __dirname from '../utils.js';
+import __dirname from '../utils/utils.js';
 
 const customLevels = {
   levels: {

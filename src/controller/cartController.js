@@ -1,7 +1,7 @@
 import { ProductService } from "../services/ProductService.js";
 import { TicketService } from "../services/TicketService.js";
 import { CartService } from "../services/cartService.js";
-import { email } from "../utils.js";
+import { email } from "../utils/utils.js";
 const productService = new ProductService();
 
 export const createCart = async (request, response) => {

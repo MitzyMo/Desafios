@@ -6,8 +6,9 @@ import productRouter from "./routes/productsRouter.js";
 import cartsRouter from "./routes/cartsRouter.js";
 import viewsRouter from "./routes/viewsRouter.js";
 import sessionRouter from "./routes/sessionRouter.js";
+import usersRouter from "./routes/usersRouter.js";
 import path from "path";
-import __dirname from "./utils.js";
+import __dirname from "./utils/utils.js";
 import mongoose from "mongoose";
 import { productModel } from "./dao/models/productModel.js";
 import { messagesModel } from "./dao/models/messageModel.js";
@@ -46,12 +47,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
-app.set("views", path.join(__dirname, "views"));
-
+app.set("views", path.join(__dirname, "../views"));
+//console.log("Views directory:", path.join(__dirname, "views"));
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
 app.use("/api/sessions", sessionRouter);
+app.use("/api/users", usersRouter)
 
 const serverHTTP = app.listen(PORT, (error) => {
   if (error) {

@@ -1,10 +1,10 @@
 import passport from "passport";
+import { config } from "./config.js";
 import local from "passport-local";
 import github from "passport-github2";
 import { UserManager } from "../dao/UserManagerDB.js";
-import { generateHash, validatePassword } from "../utils.js";
-import { config } from "./config.js";
-import { CartService } from "../services/CartService.js";
+import { generateHash, validatePassword } from "../utils/utils.js";
+import { CartService } from "../services/cartService.js";
 
 const userManager = new UserManager();
 

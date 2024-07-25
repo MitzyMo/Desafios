@@ -18,6 +18,7 @@ export const config = {
   CLIENT_ID: process.env.CLIENT_ID,
   CLIENT_SECRET: process.env.CLIENT_SECRET,
   UTIL_SECRET: process.env.SECRET,
+  SECRETJWT: process.env.SECRETJWT,
   ADMIN_USER: process.env.ADMIN_USER,
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
   SERVICE_NODEMAILER: process.env.SERVICE_NODEMAILER,
