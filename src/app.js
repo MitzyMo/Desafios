@@ -17,18 +17,22 @@ import MongoStore from "connect-mongo";
 import { initPassport } from "./config/passportConfig.js";
 import passport from "passport";
 import { config } from "./config/config.js";
+import { handleCustomError } from "./middleware/errorHandler.js";
 import logger, { middlewareLogger } from "./middleware/logger.js";
+import mockingRouter from "./routes/mockingRouter.js";
 
 
 const PORT = config.PORT;
 const app = express();
 let serverSocket;
 
-
+// Middleware
 app.use(middlewareLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+
+// Session Configuration
 app.use(
   sessions({
     secret: config.UTIL_SECRET,
@@ -42,18 +46,27 @@ app.use(
     }),
   })
 );
+// Passport Configuration
 initPassport();
 app.use(passport.initialize());
 app.use(passport.session());
+// View Engine Setup
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "../views"));//console.log("Views directory:", path.join(__dirname, "views"));
+
+// Routes
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
+app.use("/", mockingRouter); // New mocking endpoint
 app.use("/api/sessions", sessionRouter);
 app.use("/api/users", usersRouter)
 
+// Error Handler
+app.use(handleCustomError);
+
+// Database Connection
 const serverHTTP = app.listen(PORT, (error) => {
   if (error) {
     logger.fatal("Failed to start the server:", error);
@@ -78,7 +91,7 @@ bdConnection();
 // Socket.io Setup
 serverSocket = new Server(serverHTTP);
 serverSocket.on("connection", async (socket) => {
-  console.log(`Client connected with id ${socket.id}`);
+  logger.info(`Client connected with id ${socket.id}`);
   const products = await productModel.find();
   socket.emit("products", products);
 
@@ -103,4 +116,4 @@ process.on("exit", (code) => {
   console.log(`Process exiting with code ${code}`);
 });
 
-export default serverSocket; 
+export default serverSocket;
