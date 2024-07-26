@@ -23,7 +23,12 @@ router.post(
         return response.redirect(`/login?message=User registered successfully`);
       } else {
         response.setHeader("Content-Type", "application/json");
-        return response.status(201).json({ payload: "Registration successful...!!!", user: request.user });
+        return response
+          .status(201)
+          .json({
+            payload: "Registration successful...!!!",
+            user: request.user,
+          });
       }
     } catch (error) {
       response.status(500).json({
@@ -63,7 +68,9 @@ router.get(
   (request, response) => {
     request.session.user = request.user;
     response.setHeader("Content-Type", "application/json");
-    return response.status(200).json({ payload: "Successful login", user: request.user });
+    return response
+      .status(200)
+      .json({ payload: "Successful login", user: request.user });
   }
 );
 
@@ -81,15 +88,13 @@ router.get("/logout", (request, response) => {
 });
 
 router.get("/current", (request, response) => {
-    if (!request.session.user) {
-      return response.status(401).json({ error: "No authenticated user" });
-    }
-    // Respond with relevant user data (excluding password)
-    const user = new UserDTO(request.user );
-    delete user.password;
-    response.status(200).json({ user });
-  });
-
-  
+  if (!request.session.user) {
+    return response.status(401).json({ error: "No authenticated user" });
+  }
+  // Respond with relevant user data (excluding password)
+  const user = new UserDTO(request.user);
+  delete user.password;
+  response.status(200).json({ user });
+});
 
 export default router;
