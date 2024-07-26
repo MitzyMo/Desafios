@@ -14,10 +14,10 @@ export class UserManager{
     }
     async update(id, hashPassword) {
 
-      return await usersModel.findByIdAndUpdate(id, {password: hashPassword}, { runValidators: true, returnDocument: "after" })
+      return await userModel.findByIdAndUpdate(id, {password: hashPassword}, { runValidators: true, returnDocument: "after" })
   }
 
     async updateRole(id, newRole) {
-      return await usersModel.findByIdAndUpdate(id, {role: newRole}, { runValidators: true, returnDocument: "after" })
+      return await userModel.findByIdAndUpdate(id, {role: newRole}, { runValidators: true, returnDocument: "after" })
   }
 }

@@ -30,7 +30,6 @@ export const getResetPassword = async (request, response) => {
     }
 };
 
-
 export const getValidateNewPassword = async (request, response) => {
     let { password, token } = request.body;
 
@@ -40,7 +39,7 @@ export const getValidateNewPassword = async (request, response) => {
     }
 
     let decodedToken;
-    
+
     try {
         decodedToken = jwt.verify(token, config.SECRETJWT);
     } catch (error) {
@@ -48,27 +47,26 @@ export const getValidateNewPassword = async (request, response) => {
         return response.status(400).json({ error: "Invalid or expired token." });
     }
 
-    // Save user's ID
     let id = decodedToken._id;
 
     try {
-        // Validate if the new password is not the same as the previous one
         if (!validatePassword(password, decodedToken.password)) {
             logger.debug("Password different, it may be hashed and saved");
             let hashedPassword = generateHash(password);
+            logger.debug(`Password = ${password} Hashed =${hashedPassword}`);
             let result = await UserService.updatePassword(id, hashedPassword);
-            response.setHeader("Content-Type", "text/html");
+            response.setHeader("Content-Type", "application/json");
             response.status(200).json(result);
         } else {
-            response.setHeader("Content-Type", "text/html");
+            response.setHeader("Content-Type", "application/json");
             response.status(400).json({ message: "The new password has to be different from the one previously set." });
         }
     } catch (error) {
+        logger.error(`Error while updating password: ${error.message}`);
         response.setHeader("Content-Type", "application/json");
         return response.status(500).json({ error: "Server error while updating user password." });
     }
 };
-
 
 export const getPremium = async (request, response) => {
 

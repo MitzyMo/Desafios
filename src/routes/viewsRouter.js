@@ -59,8 +59,6 @@ router.post("/register", passport.authenticate("register", { failureRedirect: "/
    try {
      // Send registration email
      await sendRegistrationEmail(request.user.email);
-
-
      if (web) {
        return response.redirect(`/login?message=User registered successfully`);
      } else {
