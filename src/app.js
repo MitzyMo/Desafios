@@ -47,8 +47,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
-app.set("views", path.join(__dirname, "../views"));
-//console.log("Views directory:", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "../views"));//console.log("Views directory:", path.join(__dirname, "views"));
 app.use("/api/products", productRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
@@ -76,23 +75,19 @@ const bdConnection = async () => {
 
 bdConnection();
 
+// Socket.io Setup
 serverSocket = new Server(serverHTTP);
-
 serverSocket.on("connection", async (socket) => {
-  logger.info(`Client connected with id ${socket.id}`);
+  console.log(`Client connected with id ${socket.id}`);
   const products = await productModel.find();
   socket.emit("products", products);
 
   let users = [];
 
-  logger.info(`User connected with id: ${socket.id}`);
-
   socket.on("id", async (name) => {
     users.push({ id: socket.id, name });
     let messages = await messagesModel.find().lean();
-    messages = messages.map((m) => {
-      return { name: m.user, message: m.message };
-    });
+    messages = messages.map(m => ({ name: m.user, message: m.message }));
     socket.emit("previousMessage", messages);
     socket.broadcast.emit("newUser", name);
   });
@@ -103,9 +98,9 @@ serverSocket.on("connection", async (socket) => {
   });
 });
 
+// Clean up resources on exit
 process.on("exit", (code) => {
-  logger.info(`Process exiting with code ${code}`);
-  // Clean up resources, if necessary
+  console.log(`Process exiting with code ${code}`);
 });
 
-export default serverSocket;
+export default serverSocket; 

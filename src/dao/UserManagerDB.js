@@ -1,6 +1,5 @@
 import { userModel } from "./models/UserModel.js"
 
-
 export class UserManager{
 
     async create(user){

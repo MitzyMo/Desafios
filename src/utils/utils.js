@@ -28,7 +28,7 @@ export const upload = multer({ storage: storage });
 
 const { SERVICE_NODEMAILER, PORT_NODEMAILER, USER_NODEMAILER, PASS_NODEMAILER, FROM_NODEMAILER } = config;
 
-export const email = async (to, subject, html) => {
+export const emailTransport = async (to, subject, html) => {
   const transporter = nodemailer.createTransport({
     service: SERVICE_NODEMAILER,
     port: PORT_NODEMAILER,
@@ -49,7 +49,7 @@ export const email = async (to, subject, html) => {
 export function verifyJWT(request, response, next) {
   const token = request.cookies['codercookie'];
   if (token) {
-    jwt.verify(token, SECRET, (error, token) => {
+    jwt.verify(token, SECRET, (error, decodedToken) => {
       if (error) {
         logger.debug('invalid Token:', error.message);
       } else {
