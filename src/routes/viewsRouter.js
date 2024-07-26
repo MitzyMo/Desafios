@@ -7,6 +7,7 @@ import { auth } from "../middleware/auth.js";
 import { sendRegistrationEmail } from "../services/MailService.js";
 import { authRole } from "../middleware/authRole.js";
 import { config } from "../config/config.js";
+import logger from "../middleware/logger.js";
 
 
 const router = express.Router();
@@ -114,6 +115,7 @@ router.get("/profile", auth, (request, response) => {
 
 // Products Route
 router.get("/products", auth, async (request, response) => {
+  logger.debug(`Entered getProducts`)
  try {
    let cart = { _id: request.session.user.cart._id };
    let { limit, page, category, status, sort } = request.query;
@@ -161,12 +163,13 @@ router.get("/products", auth, async (request, response) => {
  }
 });
 
-
 // Cart Route
 router.get("/carts/:cid", authRole(['user', 'premium']), async (request, response) => {
  try {
    const { cid } = request.params;
    const cart = await cartManager.getCartById(cid);
+   logger.debug(`Testing cart ID in View Router: ${cid}`);
+   logger.debug(`Testing cart in View Router:${JSON.stringify(cart.products,null,2)}`);
    return response.status(200).render("cart", { cart, login: request.session.user });
  } catch (error) {
    request.logger.error(`Error on Cart Route: ${error.message}`);

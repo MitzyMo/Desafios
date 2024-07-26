@@ -1,3 +1,4 @@
+import logger from "../middleware/logger.js";
 import { ProductService } from "../services/ProductService.js";
 import { TicketService } from "../services/TicketService.js";
 import { CartService } from "../services/cartService.js";
@@ -24,8 +25,10 @@ export const getCartById = async (request, response) => {
 };
 
 export const addProductToCart = async (request, response) => {
+  logger.debug(`Adding to cart`)
   try {
     const { cid, pid } = request.params;
+    logger.debug(`Adding to cart params in CART Controller ${cid} , ${pid}` )
     const cart = await CartService.addProductToCart(cid, pid);
     response.status(201).json({ cart });
   } catch (error) {

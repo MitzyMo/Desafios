@@ -16,8 +16,8 @@ router.get("/",getProducts);
 router.post("/",createProduct);
 router.get("/paginate",getProductsPaginate);
 router.get("/:pid",getProductById);
-router.post("/",authRole('admin', 'premium'),addProduct);
-router.put("/:pid",authRole('admin'),updateProduct);
-router.delete("/:pid",authRole('admin', 'premium'),deleteProduct);
+router.post("/",authRole(['admin', 'premium']),addProduct);
+router.put("/:pid",authRole(['admin']),updateProduct);
+router.delete("/:pid",authRole(['admin', 'premium']),deleteProduct);
 
 export default router;
