@@ -1,7 +1,7 @@
 import { ProductService } from "../services/ProductService.js";
 import { TicketService } from "../services/TicketService.js";
 import { CartService } from "../services/cartService.js";
-import { email } from "../utils.js";
+import { emailTransport } from "../utils/utils.js";
 const productService = new ProductService();
 
 export const createCart = async (request, response) => {
@@ -152,7 +152,7 @@ export const purchaseCart = async (request, response) => {
       
       if (productsInStock.length > 0 && productsOutOfStock.length === 0) {
         console.log('Sending email to:', user.email);
-        email(user.email, "Purchase Ticket", htmlContent());
+        emailTransport(user.email, "Purchase Ticket", htmlContent());
         console.log('Response Data:', {
           status: "success",
           message: "Purchase Successful.",
@@ -175,7 +175,8 @@ export const purchaseCart = async (request, response) => {
           confirmed: productsInStock,
           rejected: productsOutOfStock,
         });
-        email(user.email, "Purchase Ticket", htmlContent());
+      
+        emailTransport(user.email, "Purchase Ticket", htmlContent());
         return response.status(200).json({
           status: "partial_success",
           message: "The purchase of some products could not be completed due to lack of stock.",

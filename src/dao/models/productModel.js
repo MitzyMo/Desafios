@@ -5,6 +5,7 @@ const collectionName = "products";
 const productSchema = new mongoose.Schema(
   {
     title: { type: String, required: [true, "The Product Name is mandatory"] },
+    owner: {type: String, default: 'admin'},
     description: {type: String,required: [true, "The Description is mandatory"],},
     code: {type: String,required: [true, "The Code is mandatory and must be unique"],unique: true,},
     price: { type: Number, required: [true, "The Price is mandatory"] },

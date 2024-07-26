@@ -3,17 +3,17 @@ import { ProductService } from "../services/ProductService.js";
 
 const manager = new ProductService();
 
-export const getProducts = async (req, res) => {
+export const getProducts = async (request, response) => {
   try {
-    const limit = req.query.limit;
+    const limit = request.query.limit;
     const { totalProducts, data } = await manager.getProducts(limit);
-    res.json({ totalProducts, data });
+    response.json({ totalProducts, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    response.status(500).json({ error: error.message });
   }
 };
 
-export const getProductsPaginate = async (req, res) => {
+export const getProductsPaginate = async (request, response) => {
   let sortQuery = {};
   if (sort === "asc") {
     sortQuery = { price: 1 };
@@ -28,54 +28,54 @@ export const getProductsPaginate = async (req, res) => {
     filterQuery.status = status;
   }
   try {
-    const { limit, page, category, status, sort } = req.query;
+    const { limit, page, category, status, sort } = request.query;
     const result = await manager.getProductsPaginate(limit, page, category, status, sort);
-    res.json(result);
+    response.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    response.status(500).json({ error: error.message });
   }
 };
 
-export const getProductById = async (req, res) => {
+export const getProductById = async (request, response) => {
   try {
-    const pid = req.params.pid;
+    const pid = request.params.pid;
     const product = await manager.getProductById(pid);
-    res.json({ product });
+    response.json({ product });
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    response.status(404).json({ error: error.message });
   }
 };
 
-export const addProduct = async (req, res) => {
+export const addProduct = async (request, response) => {
   try {
-    const product = req.body;
+    const product = request.body;
     const newProduct = await manager.addProduct(product);
     serverSocket.emit("products", await manager.getProducts());
-    res.status(201).json({ product: newProduct });
+    response.status(201).json({ product: newProduct });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    response.status(400).json({ error: error.message });
   }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (request, response) => {
   try {
-    const pid = req.params.pid;
-    const updatedProduct = req.body;
+    const pid = request.params.pid;
+    const updatedProduct = request.body;
     const uproduct = await manager.updateProduct(pid, updatedProduct);
     serverSocket.emit("products", await manager.getProducts());
-    res.json({ uproduct });
+    response.json({ uproduct });
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    response.status(404).json({ error: error.message });
   }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (request, response) => {
   try {
-    const pid = req.params.pid;
+    const pid = request.params.pid;
     const dproduct = await manager.deleteProduct(pid);
     serverSocket.emit("products", await manager.getProducts());
-    res.json(dproduct);
+    response.json(dproduct);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    response.status(404).json({ error: error.message });
   }
 };

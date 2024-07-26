@@ -1,6 +1,5 @@
 import { userModel } from "./models/UserModel.js"
 
-
 export class UserManager{
 
     async create(user){
@@ -13,4 +12,12 @@ export class UserManager{
     async getByPopulate(filter={}){
         return await userModel.findOne(filter).populate("cart").lean()
     }
+    async update(id, hashPassword) {
+
+      return await userModel.findByIdAndUpdate(id, {password: hashPassword}, { runValidators: true, returnDocument: "after" })
+  }
+
+    async updateRole(id, newRole) {
+      return await userModel.findByIdAndUpdate(id, {role: newRole}, { runValidators: true, returnDocument: "after" })
+  }
 }

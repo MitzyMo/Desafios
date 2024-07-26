@@ -1,6 +1,6 @@
 import winston from 'winston';
 import path from 'path';
-import __dirname from '../utils.js';
+import __dirname from '../utils/utils.js';
 
 const customLevels = {
   levels: {
@@ -62,8 +62,8 @@ const createLogger = (env) => {
 
 const logger = createLogger(process.env.NODE_ENV);
 
-export const middlewareLogger = (req, res, next) => {
-  req.logger = logger;
+export const middlewareLogger = (request, response, next) => {
+  request.logger = logger;
   next();
 };
 

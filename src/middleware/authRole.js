@@ -1,8 +1,8 @@
 export const authRole = (role) => {
-  return (req, res, next) => {
-    if (!req.session.user || req.session.user.role !== role) {
-      res.setHeader("Content-Type", "application/json");
-      return res.status(403).json({ error: "Access denied" });
+  return (request, response, next) => {
+    if (!request.session.user || request.session.user.role !== role) {
+      response.setHeader("Content-Type", "application/json");
+      return response.status(403).json({ error: "Access denied" });
     }
     next();
   };

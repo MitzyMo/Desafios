@@ -1,5 +1,5 @@
 import path from 'path'; // Import path module
-import __dirname from "../src/utils.js"; // Import __dirname from utils.js
+import __dirname from "../src/utils/utils.js"; // Import __dirname from utils.js
 import ProductManagerModule from '../src/dao/ProductManager.js';
 const { ProductManager } = ProductManagerModule;
 let filePath = path.join(__dirname,'..','src', "data", "products.json");
