@@ -216,32 +216,39 @@ router.get("/forgot-password", (request, response) => {
 });
 
 
-//Get new hassed password.
+// Get new hashed password.
 router.get("/newPassword/:token", (request, response) => {
- //Retrieve Token
- let token = req.params.token
-// Validate Token
- let decodedToken
- try {
-     decodedToken = jwt.verify(token, config.SECRETJWT);
-     request.logger.debug('Accessed forgot-password',decodedToken);
-   } catch (error) {
-     if (error.name === 'TokenExpiredError') {
-       request.logger.info('Accessed forgot-password',decodedToken);
-     } else if (error.name === 'JsonWebTokenError') {
-       request.logger.info('Accessed forgot-password',decodedToken);
-     } else {
-       request.logger.error('Accessed forgot-password',error);
-     }
-   }
-   //Re direct based on token's validation.
-   if (decodedToken) {
-       res.setHeader("Content-Type", "text/html")
-       return res.status(200).render("newPassword", decodedToken)
-   } else {
-     res.setHeader("Content-Type", "text/html")
-     res.status(400).render("login", {message: "Either the token expired or is incorrect, you should request a new password reset email." })
- }
-}
-);
+  // Retrieve Token
+  let token = request.params.token;
+  console.log(token);
+  let decodedToken;
+  
+  try {
+      // Validate Token
+      decodedToken = jwt.verify(token, config.SECRETJWT);
+      request.logger.debug('Accessed forgot-password', decodedToken);
+  } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+          request.logger.info('Accessed forgot-password - Token expired', decodedToken);
+      } else if (error.name === 'JsonWebTokenError') {
+          request.logger.info('Accessed forgot-password - Invalid token', decodedToken);
+      } else {
+          request.logger.error('Accessed forgot-password - Error', error);
+      }
+  }
+  
+  // Redirect based on token's validation.
+  if (decodedToken) {
+      response.setHeader("Content-Type", "text/html");
+      return response.status(200).render("newPassword", { token, ...decodedToken });
+  } else {
+      response.setHeader("Content-Type", "text/html");
+      response.status(400).render("login", { message: "Either the token expired or is incorrect, you should request a new password reset email." });
+  }
+});
+
+
+
+
+
 export default router;

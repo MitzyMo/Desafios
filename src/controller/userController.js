@@ -9,7 +9,6 @@ export const getResetPassword = async (request, response) => {
     let { email } = request.body;;
     try {
         let user = await UserService.verifyEmail(email);
-        console.log('user: ', user);
         if (user) {    
             let token = jwt.sign(user, config.SECRETJWT, { expiresIn: "1h" });
             response.cookie("usercookie", token, { httpOnly: true });
@@ -23,7 +22,7 @@ export const getResetPassword = async (request, response) => {
             response.status(200).json(`You will receive an email at ${user.email} to reset your password.`);
         } else {
             response.setHeader("Content-Type", "text/html");
-            response.status(404).json({ message: "The email is not register." });
+            response.status(404).json({ message: "The email is not register. Please validate you input and try again." });
         }
     } catch (error) {
         response.setHeader("Content-Type", "application/json");
@@ -33,40 +32,43 @@ export const getResetPassword = async (request, response) => {
 
 
 export const getValidateNewPassword = async (request, response) => {
+    let { password, token } = request.body;
 
-        if (!request.cookies.usercookie) {
-            response.setHeader("Content-Type", "application/json")
-            return response.status(400).json({ error: "The password was already set" })
-        }
-        let {password} = request.body
-        let token = request.params.token
-        
-        let decodedToken = jwt.verify(token, config.SECRETJWT)
-        console.log(password)
-        console.log(decodedToken)
-
-        //Save users ID
-        let id = decodedToken._id       
-
-        try {
-            //Validate is not the same password previousle set
-            if (!validatePassword(password, decodedToken.password)) {
-                logger.debug("Pwd diffeent it may be hashed and save")
-                let hashedPassword = generateHash(password)
-                let result = await UserService.updatePassword(id, hashedPassword)
-                response.clearCookie("usercookie")
-                response.setHeader("Content-Type", "text/html")
-                response.status(200).json(result)
-            } else {
-                response.setHeader("Content-Type", "text/html")
-                response.status(400).json({ message: "The new password has to be different from the one previously set." });
-
-            }            
-        } catch (error) {
-            response.setHeader("Content-Type", "application/json")
-            return response.status(500).json({ error: "Error en el Servidor al querer actualizar la clave del usuario" })            
-        }
+    if (!token) {
+        response.setHeader("Content-Type", "application/json");
+        return response.status(400).json({ error: "Invalid or missing token." });
     }
+
+    let decodedToken;
+    
+    try {
+        decodedToken = jwt.verify(token, config.SECRETJWT);
+    } catch (error) {
+        response.setHeader("Content-Type", "application/json");
+        return response.status(400).json({ error: "Invalid or expired token." });
+    }
+
+    // Save user's ID
+    let id = decodedToken._id;
+
+    try {
+        // Validate if the new password is not the same as the previous one
+        if (!validatePassword(password, decodedToken.password)) {
+            logger.debug("Password different, it may be hashed and saved");
+            let hashedPassword = generateHash(password);
+            let result = await UserService.updatePassword(id, hashedPassword);
+            response.setHeader("Content-Type", "text/html");
+            response.status(200).json(result);
+        } else {
+            response.setHeader("Content-Type", "text/html");
+            response.status(400).json({ message: "The new password has to be different from the one previously set." });
+        }
+    } catch (error) {
+        response.setHeader("Content-Type", "application/json");
+        return response.status(500).json({ error: "Server error while updating user password." });
+    }
+};
+
 
 export const getPremium = async (request, response) => {
 

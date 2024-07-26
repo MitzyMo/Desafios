@@ -62,8 +62,8 @@ const createLogger = (env) => {
 
 const logger = createLogger(process.env.NODE_ENV);
 
-export const middlewareLogger = (req, res, next) => {
-  req.logger = logger;
+export const middlewareLogger = (request, response, next) => {
+  request.logger = logger;
   next();
 };
 
