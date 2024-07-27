@@ -1,4 +1,3 @@
-
 import express from "express";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
@@ -20,7 +19,6 @@ import { config } from "./config/config.js";
 import { handleCustomError } from "./middleware/errorHandler.js";
 import logger, { middlewareLogger } from "./middleware/logger.js";
 import mockingRouter from "./routes/mockingRouter.js";
-
 
 const PORT = config.PORT;
 const app = express();

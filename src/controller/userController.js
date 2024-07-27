@@ -104,7 +104,4 @@ export const getPremium = async (request, response) => {
             response.setHeader("Content-Type", "application/json")
             return response.status(500).json({ error: "Unexpected error while modifying user." })            
         }        
-    }  
-    
-
-
+}

@@ -23,5 +23,4 @@ export const UserService = {
     async updateRole (id, nuevoRole) {
         return manager.updateRole(id, nuevoRole)
     }
-
 }

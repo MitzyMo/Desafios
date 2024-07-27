@@ -74,8 +74,7 @@ export class CartManager {
             logger.error(`Error in addProductToCart: ${error.message}`);
             throw new Error(error.message);
         }
-    }
-    
+    } 
     async deleteProductFromCart(cid, pid) {
         try {
         if (!mongoose.isValidObjectId(cid)) {

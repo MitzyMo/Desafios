@@ -6,7 +6,6 @@ const login=async(e)=>{
     let body={
         email, password
     }
-
     let respuesta=await fetch("/api/sessions/login", {
         method:"post", 
         headers:{

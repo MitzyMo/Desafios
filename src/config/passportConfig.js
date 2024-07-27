@@ -7,7 +7,7 @@ import { generateHash, validatePassword } from "../utils/utils.js";
 import { CartService } from "../services/cartService.js";
 
 const userManager = new UserManager();
-
+////Email With Github...
 export const initPassport = () => {
   passport.use(
     "github",
@@ -42,75 +42,79 @@ export const initPassport = () => {
       }
     )
   );
-
-  passport.use(
-    "register",
-    new local.Strategy(
-      {
-        passReqToCallback: true,
-        usernameField: "email",
-      },
-      async (request, username, password, done) => {
-        try {
-          let { firstName, lastName, age, role } = request.body;
-          if (!firstName || !lastName) {
-            return done(null, false);
-          }
-          let exists = await userManager.getBy({ email: username });
-          if (exists) {
-            return done(null, false);
-          }
-          let newCart = await CartService.createCartInternal();
-          password = generateHash(password);
-          let user = await userManager.create({
-            firstName,
-            lastName,
-            age,
-            email: username,
-            role,
-            password,
-            cart: newCart._id,
-          });
-          return done(null, user);
-        } catch (error) {
-          return done(error);
+//Register...
+passport.use(
+  "register",
+  new local.Strategy(
+    {
+      passReqToCallback: true,
+      usernameField: "email",
+    },
+    async (request, username, password, done) => {
+      try {
+        let { firstName, lastName, age, role } = request.body;
+        if (!firstName || !lastName) {
+          return done(null, false);
         }
+        let exists = await userManager.getBy({ email: username });
+        if (exists) {
+          return done(null, false);
+        }
+        let newCart = await CartService.createCartInternal();
+        password = generateHash(password);
+        let user = await userManager.create({
+          firstName,
+          lastName,
+          age,
+          email: username,
+          role: role || 'user',
+          password,
+          cart: newCart._id,
+        });
+        return done(null, user);
+      } catch (error) {
+        return done(error);
       }
-    )
-  );
-
-  passport.use(
-    "login",
-    new local.Strategy(
-      {
-        passReqToCallback: true,
-        usernameField: "email",
-      },
-      async (request, username, password, done) => {
-        try {
-          let user = await userManager.getByPopulate({ email: username });
-          if (!user) {
-            return done(null, false);
-          }
-          if (!validatePassword(password, user.password)) {
-            return done(null, false);
-          }
-          if (user.email === config.ADMIN_USER && password === config.ADMIN_PASSWORD) {
-            request.session.isAdmin = true;
-            user.role = 'admin';
+    }
+  )
+);
+//Email With Login...
+passport.use(
+  "login",
+  new local.Strategy(
+    {
+      passReqToCallback: true,
+      usernameField: "email",
+    },
+    async (request, username, password, done) => {
+      try {
+        let user = await userManager.getByPopulate({ email: username });
+        if (!user) {
+          return done(null, false);
+        }
+        if (!validatePassword(password, user.password)) {
+          return done(null, false);
+        }
+        
+        if (user.email === config.ADMIN_USER && password === config.ADMIN_PASSWORD) {
+          request.session.isAdmin = true;
+          user.role = 'admin';
+        } else {
+          request.session.isAdmin = false;
+          if (user.role === 'premium') {
+            user.role = 'premium';
           } else {
-            request.session.isAdmin = false;
             user.role = 'user';
           }
-          request.session.user = user;
-          return done(null, user);
-        } catch (error) {
-          return done(error);
         }
+        request.session.user = user;
+        return done(null, user);
+      } catch (error) {
+        return done(error);
       }
-    )
-  );
-
+    }
+  )
+);
   passport.serializeUser((user, done) => {
     return done(null, user._id);
   });
