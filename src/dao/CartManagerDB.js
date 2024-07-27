@@ -32,6 +32,8 @@ export class CartManager {
     }
     async addProductToCart(cid, pid) {
         try {
+            logger.debug(`addProductToCart called with cid: ${cid}, pid: ${pid}`);
+            
             if (!mongoose.isValidObjectId(cid)) {
                 throw new Error(`Cart with id ${cid} not found.`);
             }
@@ -40,32 +42,36 @@ export class CartManager {
             }
     
             const cart = await cartModel.findById(cid);
+            logger.debug(`Cart found: ${JSON.stringify(cart)}`);
+            
             if (!cart) {
                 throw new Error(`Cart with id ${cid} not found.`);
             }
     
             const product = await productModel.findById(pid);
-            logger.debug(`Validating PRODUCT saved in adding to cart ${JSON.stringify(product, null, 2)} In manager DB`);
+            logger.debug(`Product found: ${JSON.stringify(product)}`);
+            
             if (!product) {
                 throw new Error(`Product with id ${pid} not found.`);
             }
     
-            const productIndex = cart.products.findIndex(
-                (product) => product.productId.toString() === pid.toString()
-            );
-            logger.debug(`Validating PROD INDEX saved in adding to cart ${productIndex}`);
-    
+            // Filter out invalid product entries
+            cart.products = cart.products.filter(p => p.productId);
+            
+            const productIndex = cart.products.findIndex(product => product.productId.toString() === pid);
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity++;
+                logger.debug(`Product quantity incremented.`);
             } else {
                 cart.products.push({ productId: pid, quantity: 1 });
+                logger.debug(`Product added to cart.`);
             }
     
             await cart.save();
-            logger.debug(`Validating cart saved in adding to cart ${JSON.stringify(cart, null, 2)} In manager DB`);
+            logger.debug(`Cart saved: ${JSON.stringify(cart)}`);
             return cart;
         } catch (error) {
-            logger.error(`Error adding product to cart: ${error.message}`);
+            logger.error(`Error in addProductToCart: ${error.message}`);
             throw new Error(error.message);
         }
     }

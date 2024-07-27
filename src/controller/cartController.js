@@ -28,13 +28,15 @@ export const addProductToCart = async (request, response) => {
   logger.debug(`Adding to cart`)
   try {
     const { cid, pid } = request.params;
-    logger.debug(`Adding to cart params in CART Controller ${cid} , ${pid}` )
+    logger.debug(`Adding to cart params in CART Controller ${cid} , ${pid}`);
     const cart = await CartService.addProductToCart(cid, pid);
     response.status(201).json({ cart });
   } catch (error) {
+    logger.error(`Error in addProductToCart controller: ${error.message}`);
     response.status(404).json({ error: error.message });
   }
 };
+
 
 export const deleteProductFromCart = async (request, response) => {
   try {
