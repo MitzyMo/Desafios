@@ -77,7 +77,7 @@ export const createProduct = async (request, response, next) => {
     }
 
     const newProduct = request.body;
-    const result = await productModel.create(newProduct);
+    const result = await manager.addProduct(newProduct);
     response.status(201).json(result);
   } catch (error) {
     next(error);
