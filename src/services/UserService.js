@@ -2,6 +2,13 @@ import { UserManager } from "../dao/UserManagerDB.js";
 const manager = new UserManager();
 
 export const UserService = {
+    async getUsers(limit) {
+        try {
+            return await manager.getUsers(limit);
+            } catch (error) {
+            throw new Error("Internal Server Error");
+            }
+        },
     async createUser() {
         try {
             const user = await manager.create();
@@ -10,7 +17,14 @@ export const UserService = {
             throw error;
         }
     },
-    async getUserById(id) {
+    async getUserById(uid) {
+        try {
+            return await manager.getUserById(uid);
+          } catch (error) {
+            throw new Error(`User with id ${uid} was not found.`);
+          }
+    },
+    async getUserBy(id) {
         return manager.getBy({id})
     },
     async verifyEmail (email) {
@@ -20,8 +34,11 @@ export const UserService = {
         console.log("New Pwd:" + hashedPassword)
         return manager.update(id, hashedPassword)
     },
-    async updateRole (id, nuevoRole) {
-        return manager.updateRole(id, nuevoRole)
-    }
-
+    async updateUser(uid, updatedUser) {
+        try {
+          return await manager.updateUser(uid, updatedUser);
+        } catch (error) {
+          throw new Error(`Product with id ${uid} was not found.`);
+        }
+      }
 }

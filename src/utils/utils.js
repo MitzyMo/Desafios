@@ -4,7 +4,6 @@ import multer from "multer"
 import bcrypt from "bcrypt"
 import nodemailer from 'nodemailer'
 import {config} from '../config/config.js';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 //__dirname 01:05:00 (Express Avanzado Coder Class)

@@ -1,4 +1,3 @@
-
 import express from "express";
 import { engine } from "express-handlebars";
 import { Server } from "socket.io";
@@ -21,7 +20,6 @@ import { handleCustomError } from "./middleware/errorHandler.js";
 import logger, { middlewareLogger } from "./middleware/logger.js";
 import mockingRouter from "./routes/mockingRouter.js";
 
-
 const PORT = config.PORT;
 const app = express();
 let serverSocket;
@@ -30,7 +28,7 @@ let serverSocket;
 app.use(middlewareLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "../public")));
 
 // Session Configuration
 app.use(

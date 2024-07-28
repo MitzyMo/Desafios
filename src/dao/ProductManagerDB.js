@@ -10,7 +10,6 @@ export class ProductManager {
       throw new Error("Internal Server Error");
     }
   }
-
   async getProductsPaginate(limit = 10, page = 1, category, status, sort) {
     let sortQuery = {};
     if (sort === "asc") {
@@ -35,7 +34,6 @@ export class ProductManager {
       return { error: "Internal Server Error" };
     }
   }
-
   async getProductById(pid) {
     try {
       const product = await productModel.findById(pid);
@@ -44,7 +42,6 @@ export class ProductManager {
       throw new Error(`Product with id ${pid} was not found.`);
     }
   }
-
   async addProduct(product) {
     try {
       const existingProduct = await productModel.findOne({ code: product.code });
@@ -58,7 +55,6 @@ export class ProductManager {
       throw new Error(error.message);
     }
   }
-
   async updateProduct(pid, updatedProduct) {
     try {
       const uproduct = await productModel.findByIdAndUpdate(
