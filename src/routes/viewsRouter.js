@@ -30,8 +30,6 @@ router.get("/", async (request, response) => {
    });
  }
 });
-
-
 // Register Route
 router.get("/register", (request, response, next) => {
  if (request.session.user) {
@@ -51,8 +49,6 @@ router.get("/register", (request, response, next) => {
    });
  }
 });
-
-
 // Register Email
 router.post("/register", passport.authenticate("register", { failureRedirect: "/api/sessions/error" }),
  async (request, response) => {
@@ -75,8 +71,6 @@ router.post("/register", passport.authenticate("register", { failureRedirect: "/
    }
  }
 );
-
-
 // Login Route
 router.get("/login", (request, response, next) => {
  if (request.session.user) {
@@ -96,8 +90,6 @@ router.get("/login", (request, response, next) => {
    });
  }
 });
-
-
 // Profile Route
 router.get("/profile", auth, (request, response) => {
  try {
@@ -111,8 +103,6 @@ router.get("/profile", auth, (request, response) => {
    });
  }
 });
-
-
 // Products Route
 router.get("/products", auth, async (request, response) => {
   logger.debug(`Entered getProducts`)
@@ -162,7 +152,6 @@ router.get("/products", auth, async (request, response) => {
    });
  }
 });
-
 // Cart Route
 router.get("/carts/:cid", authRole(['user', 'premium']), async (request, response) => {
  try {
@@ -179,14 +168,12 @@ router.get("/carts/:cid", authRole(['user', 'premium']), async (request, respons
    });
  }
 });
-
 // Real-time Products Route
 router.get("/realtimeproducts", auth, (request, response) => {
   return response
     .status(200)
     .render("realTimeProducts", { styles: "main.css", login: request.session.user });
 });
-
 // Chat Route
 router.get("/chat", authRole(['user', 'premium']), (request, response) => {
  try {
@@ -200,8 +187,6 @@ router.get("/chat", authRole(['user', 'premium']), (request, response) => {
    });
  }
 });
-
-
 //Forgot Password
 router.get("/forgot-password", (request, response) => {
  try {
@@ -215,8 +200,6 @@ router.get("/forgot-password", (request, response) => {
    });
  }
 });
-
-
 // Get new hashed password.
 router.get("/newPassword/:token", (request, response) => {
   // Retrieve Token
@@ -237,7 +220,6 @@ router.get("/newPassword/:token", (request, response) => {
           request.logger.error('Accessed forgot-password - Error', error);
       }
   }
-  
   // Redirect based on token's validation.
   if (decodedToken) {
       response.setHeader("Content-Type", "text/html");
@@ -247,9 +229,4 @@ router.get("/newPassword/:token", (request, response) => {
       response.status(400).render("login", { message: "Either the token expired or is incorrect, you should request a new password reset email." });
   }
 });
-
-
-
-
-
 export default router;

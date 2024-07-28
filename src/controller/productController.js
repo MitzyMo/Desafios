@@ -52,6 +52,15 @@ export const getProductById = async (request, response) => {
 export const addProduct = async (request, response) => {
   try {
     const product = request.body;
+    const user = request.session.user;
+
+    // Set the owner based on the user's role
+    if (user.role === 'premium') {
+      product.owner = user.email;
+    } else if (user.role === 'admin') {
+      product.owner = 'admin';
+    }
+
     const newProduct = await manager.addProduct(product);
     serverSocket.emit("products", await manager.getProducts());
     response.status(201).json({ product: newProduct });
@@ -83,11 +92,22 @@ export const createProduct = async (request, response, next) => {
     next(error);
   }
 };
-
 export const updateProduct = async (request, response) => {
   try {
     const pid = request.params.pid;
     const updatedProduct = request.body;
+    const user = request.session.user;
+
+    const product = await manager.getProductById(pid);
+
+    if (!product) {
+      return response.status(404).json({ error: "Product not found." });
+    }
+
+    if (user.role === 'premium' && product.owner !== user.email) {
+      return response.status(403).json({ error: "You can only update your own products." });
+    }
+
     const uproduct = await manager.updateProduct(pid, updatedProduct);
     serverSocket.emit("products", await manager.getProducts());
     response.json({ uproduct });
@@ -95,10 +115,21 @@ export const updateProduct = async (request, response) => {
     response.status(404).json({ error: error.message });
   }
 };
-
 export const deleteProduct = async (request, response) => {
   try {
     const pid = request.params.pid;
+    const user = request.session.user;
+
+    const product = await manager.getProductById(pid);
+
+    if (!product) {
+      return response.status(404).json({ error: "Product not found." });
+    }
+
+    if (user.role === 'premium' && product.owner !== user.email) {
+      return response.status(403).json({ error: "You can only delete your own products." });
+    }
+
     const dproduct = await manager.deleteProduct(pid);
     serverSocket.emit("products", await manager.getProducts());
     response.json(dproduct);
