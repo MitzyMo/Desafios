@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: E-commerce API
+  version: 1.0.0
+  description: API documentation for the e-commerce application
+servers:
+  - url: http://localhost:3000
+    description: Development server
+paths:
+  /api/carts/{cid}:
+    get:
+      summary: Retrieve a cart by ID
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+      responses:
+        '200':
+          description: A cart.
+        '500':
+          description: Internal server error
+    delete:
+      summary: Delete all products from a cart
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+      responses:
+        '204':
+          description: No content.
+        '500':
+          description: Internal server error
+    put:
+      summary: Update a cart by ID
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+      responses:
+        '200':
+          description: The updated cart.
+        '500':
+          description: Internal server error
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Add a product to a cart
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: The product ID.
+      responses:
+        '200':
+          description: The added product.
+        '500':
+          description: Internal server error
+    delete:
+      summary: Delete a product from a cart
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: The product ID.
+      responses:
+        '204':
+          description: No content.
+        '500':
+          description: Internal server error
+    put:
+      summary: Update product quantity in a cart
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: The product ID.
+      responses:
+        '200':
+          description: The updated product quantity.
+        '500':
+          description: Internal server error
+  /api/carts/{cid}/purchase:
+    get:
+      summary: Purchase a cart
+      tags:
+        - Cart
+      parameters:
+        - in: path
+          name: cid
+          schema:
+            type: string
+          required: true
+          description: The cart ID.
+      responses:
+        '200':
+          description: The purchased cart.
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: number
