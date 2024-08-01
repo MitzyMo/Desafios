@@ -19,6 +19,9 @@ import { config } from "./config/config.js";
 import { handleCustomError } from "./middleware/errorHandler.js";
 import logger, { middlewareLogger } from "./middleware/logger.js";
 import mockingRouter from "./routes/mockingRouter.js";
+// Import Swagger packages
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 
 const PORT = config.PORT;
 const app = express();
@@ -44,6 +47,33 @@ app.use(
     }),
   })
 );
+// Swagger definition
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'E-commerce API',
+    version: '1.0.0',
+    description: 'API documentation for the e-commerce application',
+  },
+  servers: [
+    {
+      url: `http://localhost:${PORT}`,
+      description: 'Development server',
+    },
+  ],
+};
+
+const options = {
+  swaggerDefinition,
+  apis: ['./src/docs/*.yaml'],
+};
+
+// Initialize swagger-jsdoc
+const swaggerSpec = swaggerJSDoc(options);
+
+// Use Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Passport Configuration
 initPassport();
 app.use(passport.initialize());

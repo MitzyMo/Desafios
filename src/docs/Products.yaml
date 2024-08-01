@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  title: E-commerce API
+  version: 1.0.0
+  description: API documentation for the e-commerce application
+servers:
+  - url: http://localhost:3000
+    description: Development server
+paths:
+  /api/products:
+    get:
+      summary: Retrieve a list of products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: A list of products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Internal server error
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      responses:
+        '201':
+          description: Product created successfully.
+        '500':
+          description: Internal server error
+  /api/products/paginate:
+    get:
+      summary: Retrieve paginated products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Paginated products.
+        '500':
+          description: Internal server error
+  /api/products/{pid}:
+    get:
+      summary: Retrieve a product by ID
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: The product ID.
+      responses:
+        '200':
+          description: A product.
+        '500':
+          description: Internal server error
+    put:
+      summary: Update a product by ID
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: The product ID.
+      responses:
+        '200':
+          description: Product updated successfully.
+        '500':
+          description: Internal server error
+    delete:
+      summary: Delete a product by ID
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          schema:
+            type: string
+          required: true
+          description: The product ID.
+      responses:
+        '204':
+          description: No content.
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
