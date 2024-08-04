@@ -9,44 +9,19 @@ servers:
 paths:
   /api/products:
     get:
-      summary: Retrieve a list of products
+      summary: Retrieve all products
       tags:
-        - Products
+        - Product
       responses:
         '200':
           description: A list of products.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
-        '500':
-          description: Internal server error
-    post:
-      summary: Create a new product
-      tags:
-        - Products
-      responses:
-        '201':
-          description: Product created successfully.
-        '500':
-          description: Internal server error
-  /api/products/paginate:
-    get:
-      summary: Retrieve paginated products
-      tags:
-        - Products
-      responses:
-        '200':
-          description: Paginated products.
         '500':
           description: Internal server error
   /api/products/{pid}:
     get:
       summary: Retrieve a product by ID
       tags:
-        - Products
+        - Product
       parameters:
         - in: path
           name: pid
@@ -57,12 +32,14 @@ paths:
       responses:
         '200':
           description: A product.
-        '500':
-          description: Internal server error
+        '404':
+          description: Product not found.
     put:
       summary: Update a product by ID
       tags:
-        - Products
+        - Product
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: pid
@@ -70,15 +47,26 @@ paths:
             type: string
           required: true
           description: The product ID.
+      requestBody:
+        description: Product object that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
         '200':
-          description: Product updated successfully.
+          description: The updated product.
+        '404':
+          description: Product not found.
         '500':
-          description: Internal server error
+          description: Internal server error.
     delete:
       summary: Delete a product by ID
       tags:
-        - Products
+        - Product
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: pid
@@ -89,18 +77,33 @@ paths:
       responses:
         '204':
           description: No content.
-        '500':
-          description: Internal server error
+        '404':
+          description: Product not found.
 components:
   schemas:
     Product:
       type: object
       properties:
-        id:
-          type: string
-        name:
+        title:
           type: string
         description:
           type: string
         price:
           type: number
+        discountPercentage:
+          type: number
+        rating:
+          type: number
+        status:
+          type: boolean
+        stock:
+          type: number
+        brand:
+          type: string
+        category:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
