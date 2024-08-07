@@ -117,7 +117,11 @@ describe("User Module Tests", function () {
     it("should login a user", async function () {
       const loginUser = {
         email: "adminCoder@coder.com",
+<<<<<<< HEAD
         password: "adminCod3r123",
+=======
+        password: process.env.ADMIN_PASSWORD,
+>>>>>>> f9680e1 (session testing created:)
       };
       const response = await requester.post("/api/sessions/login").send(loginUser);
       if (response.status === 302) {
@@ -155,7 +159,7 @@ describe("User Module Tests", function () {
       // Perform login to get a valid token or session
       const loginResponse = await requester.post("/api/sessions/login").send({
         email: "adminCoder@coder.com",
-        password: "adminCod3r123",
+        password: process.env.ADMIN_PASSWORD,
       });
       token = loginResponse.headers['set-cookie'].find(cookie => cookie.startsWith('connect.sid')).split(';')[0];
     });
