@@ -54,11 +54,11 @@ passport.use(
       try {
         let { firstName, lastName, age, role } = request.body;
         if (!firstName || !lastName) {
-          return done(null, false);
+          return done(null, false, { message: 'First name and last name are required' });
         }
         let exists = await userManager.getBy({ email: username });
         if (exists) {
-          return done(null, false);
+          return done(null, false, { message: 'Email already in use' });
         }
         let newCart = await CartService.createCartInternal();
         password = generateHash(password);

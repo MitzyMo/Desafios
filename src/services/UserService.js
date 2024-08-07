@@ -9,14 +9,18 @@ export const UserService = {
             throw new Error("Internal Server Error");
             }
         },
-    async createUser() {
-        try {
-            const user = await manager.create();
-            return user;
-        } catch (error) {
-            throw error;
-        }
-    },
+        async createUser(user) {
+            try {
+              const existingUser = await this.verifyEmail(user.email);
+              if (existingUser) {
+                throw new Error("Email already in use");
+              }
+              const newUser = await manager.create(user);
+              return newUser;
+            } catch (error) {
+              throw error;
+            }
+          },          
     async getUserById(uid) {
         try {
             return await manager.getUserById(uid);
