@@ -116,7 +116,7 @@ describe("User Module Tests", function () {
   describe("POST /api/sessions/login", function () {
     it("should login a user", async function () {
       const loginUser = {
-        email: "adminCoder@coder.com",
+        email: process.env.ADMIN_USER,
         password: process.env.ADMIN_PASSWORD,
       };
       const response = await requester.post("/api/sessions/login").send(loginUser);

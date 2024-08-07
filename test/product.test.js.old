@@ -1,115 +1,122 @@
-import path from 'path'; // Import path module
-import __dirname from "../src/utils/utils.js"; // Import __dirname from utils.js
-import ProductManagerModule from '../src/dao/ProductManager.js';
-const { ProductManager } = ProductManagerModule;
-let filePath = path.join(__dirname,'..','src', "data", "products.json");
-//console.log(filePath);
-//----------------Initiate Test----------------//
-//console.log(process.cwd());
-const manager = new ProductManager(filePath);
-// Get all products
-const testGetProducts = async () => {
-    try {
-        const products = await manager.getProducts();
-        console.log(products);
-        } catch (error) {
-        console.error("Error:", error);
-    }
-};
+import { afterEach, before, describe, it } from "mocha";
+import { expect } from "chai";
+import supertest from "supertest";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
-// Adding a new product
-const testAddingProduct = async () => {
-    const title = "New Product";
-    const description = "Description of the new product";
-    const code = "ABC123"; // Unique product code
-    const price = 19.99;
-    const discountPercentage = 10;
-    const rating = 4.5;
-    const brand = "Brand Name";
-    const status = true;
-    const stock = 100;
-    const category = "Category Name";
-    const thumbnails = ["path/to/thumbnail1.jpg", "path/to/thumbnail2.jpg"];
-    const images = ["path/to/image1.jpg", "path/to/image2.jpg"];
+const requester = supertest("http://localhost:3000");
 
-    try {
-        const newProduct = await manager.addProduct(title, description, code, price, discountPercentage, rating, status, stock, brand, category, thumbnails, images);
-        console.log("New product added successfully:", newProduct);
-    } catch (error) {
-        console.error("Error adding product:", error);
-    }
-};
+describe("Product Module Tests", function () {
+  let adminToken;
+  let productId;
 
-// Get products by ID
-const testGetProductById = async (id) => {
-    try {
-        const product = await manager.getProductById(id);
-        console.log(product);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-};
+  before(async function () {
+    // Connect to the database
+    await mongoose.connect(process.env.DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-// Update product by ID
-const testUpdateProductById = async (id, updatedFields) => {
-    try {
-        const updateResult = await manager.updateProduct(id, updatedFields);
-        console.log(updateResult);
-    } catch (error) {
-        console.error("Error updating product:", error);
-    }
-};
+    // Log in as admin
+    const loginResponse = await requester.post("/api/sessions/login").send({
+      email: process.env.ADMIN_USER,
+      password: process.env.ADMIN_PASSWORD,
+    });
 
-// Delete product by ID
-const testDeleteProductById = async (id) => {
-    try {
-        const deleteResult = await manager.deleteProduct(id);
-        console.log(deleteResult);
-    } catch (error) {
-        console.error("Error deleting product:", error);
-    }
-};
+    adminToken = loginResponse.headers['set-cookie'].find(cookie => cookie.startsWith('connect.sid')).split(';')[0];
+  });
 
-//----------------Calling All Tests----------------//
+  after(async function () {
+    // Close database connection
+    await mongoose.connection.close();
+  });
 
-const testAll = async () => {
-    try {
-        // Get all products before adding a new one
-        console.log("----Get all products before adding a new one----");
-        await testGetProducts();
+  describe("GET /api/products", function () {
+    it("should get all products", async function () {
+      const response = await requester
+        .get("/api/products")
+        .set('Cookie', adminToken);
 
-        // Add a new product
-        console.log("----Adding a new product----");
-        await testAddingProduct();
+      expect(response.status).to.equal(200);
+      expect(response.body).to.have.property('totalProducts');
+      expect(response.body).to.have.property('data').that.is.an('array');
+    });
+  });
 
-        // Get all products after adding the new one
-        console.log("----Get all products after adding the new one----");
-        await testGetProducts();
+  describe("POST /api/products", function () {
+    it("should add a new product", async function () {
+      const newProduct = {
+        title: "Key TestFile",
+        owner: "premiumcoder@gmail.com",
+        description: "Attractive DesignMetallic materialFour key hooksReliable & DurablePremium Quality",
+        code: "A030",
+        price: 30,
+        discountPercentage: 2.92,
+        rating: 4.92,
+        status: true,
+        stock: 54,
+        brand: "Golden",
+        category: "home-decoration",
+        thumbnail: "https://cdn.dummyjson.com/product-images/30/thumbnail.jpg",
+        images: [
+          "https://cdn.dummyjson.com/product-images/30/1.jpg",
+          "https://cdn.dummyjson.com/product-images/30/2.jpg",
+          "https://cdn.dummyjson.com/product-images/30/3.jpg",
+          "https://cdn.dummyjson.com/product-images/30/thumbnail.jpg"
+        ]
+      };
+  
+      const response = await requester
+        .post("/api/products")
+        .set('Cookie', adminToken)
+        .send(newProduct);
+  
+      expect(response.status).to.equal(201);
+      expect(response.body).to.have.property('_id'); // Assuming the response directly contains the product data
+      productId = response.body._id; // Store productId for later tests
+      console.log(productId);
+    });
+  });
 
-        // Get products by ID after adding the new one
-        console.log("----Get products by ID after adding the new one----");
-        await testGetProductById(31);
+  describe("GET /api/products/:pid", function () {
+    it("should get a product by ID", async function () {
+      const response = await requester
+        .get(`/api/products/${productId}`)
+        .set('Cookie', adminToken);
 
-        // Update the newly added product
-        console.log("----Update the newly added product----");
-        await testUpdateProductById(31, { price: 29.99, stock: 50 });
+      expect(response.status).to.equal(200);
+      expect(response.body).to.have.property('product');
+      expect(response.body.product._id).to.equal(productId);
+    });
+  });
 
-        // Get products by ID after updating
-        console.log("----Get products by ID after updating----");
-        await testGetProductById(31);
+  describe("PUT /api/products/:pid", function () {
+    it("should update a product by ID", async function () {
+      const updatedProduct = {
+        price: 150,
+      };
 
-        // Delete the newly added product
-        console.log("----Delete the newly added product----");
-        await testDeleteProductById(31);
+      const response = await requester
+        .put(`/api/products/${productId}`)
+        .set('Cookie', adminToken)
+        .send(updatedProduct);
 
-        // Get all products after deleting the new one
-        console.log("----Get all products after deleting the new one----");
-        await testGetProducts(); 
+      expect(response.status).to.equal(200);
+      expect(response.body).to.have.property('uproduct');
+      expect(response.body.uproduct.price).to.equal(150);
+    });
+  });
 
-    } catch (error) {
-        console.error("Error:", error);
-    }
-};
-console.log(process.cwd());
-testAll();
-console.log(filePath);
+  describe("DELETE /api/products/:pid", function () {
+    it("should delete a product by ID", async function () {
+      const response = await requester
+        .delete(`/api/products/${productId}`)
+        .set('Cookie', adminToken);
+
+      expect(response.status).to.equal(200);
+      expect(response.body).to.have.property('_id').that.equals(productId);
+    });
+  });
+
+});
