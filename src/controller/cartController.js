@@ -32,7 +32,7 @@ export const addProductToCart = async (request, response) => {
 
     logger.debug(`Adding to cart params in CART Controller ${cid} , ${pid}`);
 
-    const product = await ProductService.getProductById(pid);
+    const product = await productService.getProductById(pid);
 
     if (user.role === 'premium' && product.owner === user.email) {
       return response.status(403).json({ error: "You cannot add your own products to your cart." });

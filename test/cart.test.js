@@ -3,120 +3,117 @@ import { expect } from "chai";
 import supertest from "supertest";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const requester = supertest("http://localhost:3000");
+let premiumToken;
+let testCartId;
+const testProductId = "663812380163b5b5f6ad5101";
 
-describe("Product Module Tests", function () {
-  let adminToken;
-  let productId;
-
+describe("Cart API Tests", function () {
+  // Connect to the database before running the tests
   before(async function () {
-    // Connect to the database
-    await mongoose.connect(process.env.DB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    // Log in as admin
-    const loginResponse = await requester.post("/api/sessions/login").send({
-      email: process.env.ADMIN_USER,
-      password: process.env.ADMIN_PASSWORD,
-    });
-
-    adminToken = loginResponse.headers['set-cookie'].find(cookie => cookie.startsWith('connect.sid')).split(';')[0];
+    await mongoose.connect(process.env.DB_URL, { dbName: process.env.DB_NAME });
   });
 
+  // Disconnect from the database after running the tests
   after(async function () {
-    // Close database connection
-    await mongoose.connection.close();
+    await mongoose.disconnect();
   });
 
-  describe("GET /api/products", function () {
-    it("should get all products", async function () {
-      const response = await requester
-        .get("/api/products")
-        .set('Cookie', adminToken);
-
-      expect(response.status).to.equal(200);
-      expect(response.body).to.have.property('totalProducts');
-      expect(response.body).to.have.property('data').that.is.an('array');
+  describe("POST /api/carts", function () {
+    it("should create a new cart", async function () {
+      const response = await requester.post("/api/carts").expect(201);
+      expect(response.body).to.have.property("cart");
+      testCartId = response.body.cart._id;
     });
   });
 
-  describe("POST /api/products", function () {
-    it("should add a new product", async function () {
-      const newProduct = {
-        title: "Key TestFile",
-        owner: "premiumcoder@gmail.com",
-        description: "Attractive DesignMetallic materialFour key hooksReliable & DurablePremium Quality",
-        code: "A030",
-        price: 30,
-        discountPercentage: 2.92,
-        rating: 4.92,
-        status: true,
-        stock: 54,
-        brand: "Golden",
-        category: "home-decoration",
-        thumbnail: "https://cdn.dummyjson.com/product-images/30/thumbnail.jpg",
-        images: [
-          "https://cdn.dummyjson.com/product-images/30/1.jpg",
-          "https://cdn.dummyjson.com/product-images/30/2.jpg",
-          "https://cdn.dummyjson.com/product-images/30/3.jpg",
-          "https://cdn.dummyjson.com/product-images/30/thumbnail.jpg"
+  describe("GET /api/carts/:cid", function () {
+    it("should get a cart by ID", async function () {
+      const response = await requester
+        .get(`/api/carts/${testCartId}`)
+        .expect(200);
+      expect(response.body).to.have.property("cart");
+    });
+
+    it("should return 404 for non-existent cart", async function () {
+      await requester.get("/api/carts/invalidid").expect(404);
+    });
+  });
+
+  describe("POST /api/carts/:cid/product/:pid", function () {
+    before(async function () {
+      // Log in as premium
+      const loginResponse = await requester.post("/api/sessions/login").send({
+        email: process.env.PREMIUM_USER,
+        password: process.env.PREMIUM_PASSWORD,
+      });
+
+      premiumToken = loginResponse.headers['set-cookie'].find(cookie => cookie.startsWith('connect.sid')).split(';')[0];
+    });
+
+    it("should add a product to the cart", async function () {
+      console.log(`cid:`, testCartId);
+      console.log(`pid2:`, testProductId);
+      
+      const response = await requester
+        .post(`/api/carts/${testCartId}/product/${testProductId}`)
+        .set('Cookie', premiumToken)
+        .expect(201);
+        
+      expect(response.body).to.have.property("cart");
+    });
+  });
+
+  /*
+  describe("PUT /api/carts/:cid", function() {
+    it("should update the cart", async function() {
+      const response = await requester.put(`/api/carts/${testCartId}`).send({
+        products: [
+          { productId: testProductId, quantity: 5 }
         ]
-      };
+      }).expect(200);
+      expect(response.body).to.have.property("message").that.equals("Cart updated successfully");
+    });
+  });
+
+  describe("PUT /api/carts/:cid/product/:pid", function() {
+    it("should update the quantity of a product in the cart", async function() {
+      const response = await requester.put(`/api/carts/${testCartId}/product/${testProductId}`).send({
+        quantity: 10
+      }).expect(200);
+      expect(response.body).to.have.property("cart");
+    });
+  });
+
+  describe("GET /api/carts/:cid/purchase", function() {
+    it("should handle cart purchase", async function() {
+      // Simulate a user with appropriate authentication and data
+      const response = await requester.get(`/api/carts/${testCartId}/purchase`)
+        .set('Authorization', 'Bearer your-auth-token')
+        .expect(200);
+      expect(response.body).to.have.property("status");
+    });
+  }
   
-      const response = await requester
-        .post("/api/products")
-        .set('Cookie', adminToken)
-        .send(newProduct);
-  
-      expect(response.status).to.equal(201);
-      expect(response.body).to.have.property('_id'); // Assuming the response directly contains the product data
-      productId = response.body._id; // Store productId for later tests
-      console.log(productId);
+  describe("DELETE /api/carts/:cid/product/:pid", function() {
+    it("should remove a product from the cart", async function() {
+      const response = await requester.delete(`/api/carts/${testCartId}/product/${testProductId}`).expect(200);
+      expect(response.body).to.have.property("cart");
+    });
+
+    it("should return 404 for non-existent product in the cart", async function() {
+      await requester.delete(`/api/carts/${testCartId}/product/invalidid`).expect(404);
     });
   });
 
-  describe("GET /api/products/:pid", function () {
-    it("should get a product by ID", async function () {
-      const response = await requester
-        .get(`/api/products/${productId}`)
-        .set('Cookie', adminToken);
-
-      expect(response.status).to.equal(200);
-      expect(response.body).to.have.property('product');
-      expect(response.body.product._id).to.equal(productId);
+  describe("DELETE /api/carts/:cid", function() {
+    it("should delete all products from the cart", async function() {
+      const response = await requester.delete(`/api/carts/${testCartId}`).expect(200);
+      expect(response.body).to.have.property("cart");
     });
-  });
-
-  describe("PUT /api/products/:pid", function () {
-    it("should update a product by ID", async function () {
-      const updatedProduct = {
-        price: 150,
-      };
-
-      const response = await requester
-        .put(`/api/products/${productId}`)
-        .set('Cookie', adminToken)
-        .send(updatedProduct);
-
-      expect(response.status).to.equal(200);
-      expect(response.body).to.have.property('uproduct');
-      expect(response.body.uproduct.price).to.equal(150);
-    });
-  });
-
-  describe("DELETE /api/products/:pid", function () {
-    it("should delete a product by ID", async function () {
-      const response = await requester
-        .delete(`/api/products/${productId}`)
-        .set('Cookie', adminToken);
-
-      expect(response.status).to.equal(200);
-      expect(response.body).to.have.property('_id').that.equals(productId);
-    });
-  });
-
+  }
+  */
 });
