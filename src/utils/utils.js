@@ -7,16 +7,21 @@ import {config} from '../config/config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 //__dirname 01:05:00 (Express Avanzado Coder Class)
-
 export default __dirname;
-
-
 export const generateHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 export const validatePassword = (password, passwordHash) => bcrypt.compareSync(password, passwordHash);
 
 const storage = multer.diskStorage({
   destination: function (request, file, cb) {
-    cb(null, path.join(__dirname, './src/uploads'));
+    let folder = 'documents';
+    if (file.mimetype.startsWith('image/')) {
+      if (file.fieldname === 'profilePicture') {
+        folder = 'profiles';
+      } else if (file.fieldname === 'productImage') {
+        folder = 'products';
+      }
+    }
+    cb(null, join(__dirname, './src/uploads', folder));
   },
   filename: function (request, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
@@ -26,7 +31,6 @@ const storage = multer.diskStorage({
 export const upload = multer({ storage: storage });
 
 const { SERVICE_NODEMAILER, PORT_NODEMAILER, USER_NODEMAILER, PASS_NODEMAILER, FROM_NODEMAILER } = config;
-
 export const emailTransport = async (to, subject, html) => {
   const transporter = nodemailer.createTransport({
     service: SERVICE_NODEMAILER,
@@ -36,7 +40,6 @@ export const emailTransport = async (to, subject, html) => {
       pass: PASS_NODEMAILER,
     },
   });
-
   return transporter.sendMail({
     from: FROM_NODEMAILER,
     to,
@@ -44,6 +47,7 @@ export const emailTransport = async (to, subject, html) => {
     html,
   });
 };
+
 
 export function verifyJWT(request, response, next) {
   const token = request.cookies['codercookie'];
