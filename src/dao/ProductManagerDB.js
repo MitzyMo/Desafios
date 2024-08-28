@@ -67,7 +67,6 @@ export class ProductManager {
       throw new Error(`Product with id ${pid} was not found.`);
     }
   }
-
   async deleteProduct(pid) {
     try {
       const dproduct = await productModel.findByIdAndDelete(pid);

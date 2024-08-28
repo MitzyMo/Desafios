@@ -8,11 +8,12 @@ import { sendRegistrationEmail } from "../services/MailService.js";
 import { authRole } from "../middleware/authRole.js";
 import { config } from "../config/config.js";
 import logger from "../middleware/logger.js";
-
+import { UserManager } from "../dao/UserManagerDB.js";
 
 const router = express.Router();
 const prodManager = new ProductManager();
 const cartManager = new CartManager();
+const userManager = new UserManager();
 
 
 // Home Route
@@ -80,7 +81,7 @@ router.get("/login", (request, response, next) => {
  }
 }, (request, response) => {
  let { error, message } = request.query;
- try {
+ try {     
    response.status(200).render("login", { error, message, login: request.session.user });
  } catch (error) {
    request.logger.error(`Error on Login Route (GET): ${error.message}`);
@@ -105,7 +106,6 @@ router.get("/profile", auth, (request, response) => {
 });
 // Products Route
 router.get("/products", auth, async (request, response) => {
-  logger.debug(`Entered getProducts`)
  try {
    let cart = { _id: request.session.user.cart._id };
    let { limit, page, category, status, sort } = request.query;
@@ -227,6 +227,48 @@ router.get("/newPassword/:token", (request, response) => {
   } else {
       response.setHeader("Content-Type", "text/html");
       response.status(400).render("login", { message: "Either the token expired or is incorrect, you should request a new password reset email." });
+  }
+});
+// Users
+router.get("/users", authRole(['admin']), async (request, response) => {
+  request.logger.debug(`accessing users`);
+  try {
+    const limit = request.query.limit || 10;
+    const { totalUsers, data } = await userManager.getUsers(limit);
+    request.logger.debug(`accessing users: ${totalUsers}`);
+    
+    const processedUsers = data.map(user => ({
+      ...user.toObject(), // Spread the full user data
+      roles: ['user', 'premium', 'admin'].map(role => ({
+        value: role,
+        selected: user.role === role
+      }))
+    }));
+    response.render("users", { users: processedUsers, totalUsers, login: request.session.user });
+  } catch (error) {
+    response.status(500).render("error", { error: "Internal Server Error", styles: "main.css" });
+  }
+});
+
+// Update User Role Route
+router.post("/users/:uid/role", authRole('admin'), async (request, response) => {
+  try {
+    const uid = request.params.uid;
+    const { role } = request.body;
+    const updatedUser = await userManager.updateUser(uid, { role }); // Assuming UserService is available
+    response.redirect("/users"); // Redirect back to the users page
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+// Delete User Route
+router.post("/users/:uid/delete", authRole('admin'), async (request, response) => {
+  try {
+    const uid = request.params.uid;
+    await userManager.deleteUser(uid); // Assuming UserService is available
+    response.redirect("/users"); // Redirect back to the users page
+  } catch (error) {
+    response.status(500).json({ error: error.message });
   }
 });
 export default router;

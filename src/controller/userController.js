@@ -1,17 +1,12 @@
-import {
-  UserService
-} from "../services/UserService.js";
+import { UserService} from "../services/UserService.js";
 import jwt from "jsonwebtoken";
-import {
-  config
-} from "../config/config.js";
+import {config} from "../config/config.js";
 import logger from "../middleware/logger.js";
 import {
   emailTransport,
   generateHash,
   validatePassword
 } from "../utils/utils.js";
-import mongoose from "mongoose";
 
 export const getUsers = async (request, response) => {
   logger.debug(`Entered getUsers`);
@@ -25,12 +20,40 @@ export const getUsers = async (request, response) => {
       totalUsers,
       data
     });
+    console.log(totalUsers, data);
   } catch (error) {
     response.status(500).json({
       error: "Error fetching Users."
     });
   }
 };
+
+export const getUsersPaginate = async (request, response) => {
+  const { limit, page, role, last_connection, sort } = request.query;
+
+  let sortQuery = {};
+  if (sort === "asc") {
+    sortQuery = { role: 1 };
+  } else if (sort === "dsc") {
+    sortQuery = { role: -1 };
+  }
+
+  let filterQuery = {};
+  if (role !== "null") {
+    filterQuery.role = role;
+  }
+  if (last_connection !== undefined && last_connection !== null) {
+    filterQuery.last_connection = last_connection;
+  }
+
+  try {
+    const result = await UserService.getUsersPaginate(limit, page, role, last_connection, sort);
+    response.json(result);
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+};
+
 
 export const getUserById = async (request, response) => {
   try {
@@ -173,5 +196,26 @@ export const upgradeToPremium = async (request, response) => {
     response.status(400).json({
       error: error.message
     });
+  }
+};
+
+export const deleteUser = async (request, response) => {
+  try {
+    const uid = request.params.uid;
+    const userSession = request.session.user;
+
+    if (!userSession || userSession.role !== 'admin') {
+      return response.status(403).json({ error: "You are not authorized" });
+    }
+
+    const user = await UserService.getUserById(uid);
+    if (!user) {
+      return response.status(404).json({ error: "User not found." });
+    }
+
+    const dUser = await UserService.deleteUser(uid);
+    response.json(dUser);
+  } catch (error) {
+    response.status(404).json({ error: error.message });
   }
 };
