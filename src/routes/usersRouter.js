@@ -4,6 +4,7 @@ import {
   getValidateNewPassword,
   updateUser,
   getUsers,
+  getUsersPaginate,
   getUserById,
   uploadDocuments,
   upgradeToPremium

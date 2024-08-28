@@ -8,7 +8,6 @@ export class ProductService {
       throw new Error("Internal Server Error");
     }
   }
-
   async getProductsPaginate(limit = 10, page = 1, category, status, sort) {
     try {
       return await manager.getProductsPaginate(limit, page, category, status, sort);
@@ -16,7 +15,6 @@ export class ProductService {
       throw new Error("Internal Server Error");
     }
   }
-
   async getProductById(pid) {
     try {
       return await manager.getProductById(pid);
@@ -24,7 +22,6 @@ export class ProductService {
       throw new Error(`Product with id ${pid} was not found.`);
     }
   }
-
   async addProduct(product) {
     try {
       return await manager.addProduct(product);
@@ -32,7 +29,6 @@ export class ProductService {
       throw new Error(error.message);
     }
   }
-
   async updateProduct(pid, updatedProduct) {
     try {
       return await manager.updateProduct(pid, updatedProduct);
@@ -41,7 +37,6 @@ export class ProductService {
       throw new Error(`Product with id ${pid} was not found.`);
     }
   }
-
   async deleteProduct(pid) {
     try {
       return await manager.deleteProduct(pid);
