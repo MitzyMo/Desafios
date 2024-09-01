@@ -94,5 +94,12 @@ export const UserService = {
     } catch (error) {
       throw new Error(`Product with id ${uid} was not found.`);
     }
+  },
+  async deleteInactiveUsers(cutoffDate) {
+    try {
+      return await manager.deleteInactiveUsers(cutoffDate);
+    } catch (error) {
+      throw new Error("Error deleting inactive users");
+    }
   }
 }

@@ -4,10 +4,10 @@ import {
   getValidateNewPassword,
   updateUser,
   getUsers,
-  getUsersPaginate,
   getUserById,
   uploadDocuments,
-  upgradeToPremium
+  upgradeToPremium,
+  deleteInactiveUsers
 } from "../controller/userController.js";
 import { authRole } from "../middleware/authRole.js";
 import { upload } from "../utils/utils.js";
@@ -26,6 +26,6 @@ router.post("/:uid/documents", upload.fields([
   { name: 'proofOfAccountStatus', maxCount: 1 }
 ]), uploadDocuments);
 router.put("/premium/:uid", authRole(['admin']), upgradeToPremium);
-
+router.delete('/', authRole(['admin']), deleteInactiveUsers);
 
 export default router;

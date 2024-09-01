@@ -54,7 +54,6 @@ export const getUsersPaginate = async (request, response) => {
   }
 };
 
-
 export const getUserById = async (request, response) => {
   try {
     const uid = request.params.uid;
@@ -217,5 +216,29 @@ export const deleteUser = async (request, response) => {
     response.json(dUser);
   } catch (error) {
     response.status(404).json({ error: error.message });
+  }
+};
+
+export const deleteInactiveUsers = async (request, response) => {
+  try {
+    const minutes = 30; // Use 2 * 24 * 60 for 2 days in production
+    const cutoffDate = new Date(Date.now() - minutes * 60 * 1000);
+
+    const usersToDelete = await UserService.deleteInactiveUsers(cutoffDate);
+
+    // Send email notifications
+    for (const user of usersToDelete) {
+      const emailStructure = `<h2>Your account has been deleted due to inactivity.</h2>`;
+      await emailTransport(user.email, "Account Deletion Notice", emailStructure);
+    }
+
+    response.status(200).json({
+      message: `${usersToDelete.length} users have been deleted due to inactivity.`,
+    });
+  } catch (error) {
+    response.status(500).json({
+      error: "Error deleting inactive users",
+      detail: error.message,
+    });
   }
 };
