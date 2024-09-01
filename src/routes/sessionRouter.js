@@ -47,6 +47,8 @@ router.post(
     let user = { ...request.user };
     delete user.password;
     request.session.user = user;
+    // Update the user's last connection
+    await userManager.updateLastConnection(user._id);
     if (web) {
       response.redirect("/products");
     } else {

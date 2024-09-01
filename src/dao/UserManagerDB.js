@@ -86,5 +86,22 @@ export class UserManager {
       throw new Error(`Product with id ${uid} was not found.`);
     }
 	}
-  
+  async deleteInactiveUsers(cutoffDate) {
+    try {
+      const usersToDelete = await userModel.find({
+        last_connection: { $lt: cutoffDate },
+      });
+
+      await userModel.deleteMany({
+        _id: { $in: usersToDelete.map((user) => user._id) },
+      });
+
+      return usersToDelete;
+    } catch (error) {
+      throw new Error("Error deleting inactive users");
+    }
+  }
+  async updateLastConnection(id) {
+    return await userModel.findByIdAndUpdate(id, { last_connection: new Date() }, { new: true });
+  }
 }
