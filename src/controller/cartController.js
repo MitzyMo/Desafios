@@ -1,7 +1,7 @@
 import logger from "../middleware/logger.js";
 import { ProductService } from "../services/ProductService.js";
 import { TicketService } from "../services/TicketService.js";
-import { CartService } from "../services/cartService.js";
+import { CartService } from "../services/CartService.js";
 import { emailTransport } from "../utils/utils.js";
 const productService = new ProductService();
 
