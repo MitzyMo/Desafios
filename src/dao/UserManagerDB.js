@@ -1,6 +1,6 @@
 import {
 	userModel
-} from "./models/UserModel.js"
+} from "./models/userModel.js"
 
 export class UserManager {
 
