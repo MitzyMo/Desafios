@@ -4,7 +4,7 @@ import local from "passport-local";
 import github from "passport-github2";
 import { UserManager } from "../dao/UserManagerDB.js";
 import { generateHash, validatePassword } from "../utils/utils.js";
-import { CartService } from "../services/cartService.js";
+import { CartService } from "../services/CartService.js";
 
 const userManager = new UserManager();
 ////Email With Github...

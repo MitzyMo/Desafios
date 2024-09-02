@@ -3,13 +3,10 @@ console.log('Cart',cid);
 
 const purchase = async() => {
     console.log('Product',cid);
-
     let response=await fetch(`/api/carts/${cid}/purchase`,{
         method:"post"
     })
-
     let data = await response.json()
-
     let formattedDate=null
     let formattedTime=null
     if(data.ticket){
@@ -18,7 +15,6 @@ const purchase = async() => {
         formattedDate = dateInArgentina.toISOString().split('T')[0];
         formattedTime = dateInArgentina.toISOString().split('T')[1].split('.')[0];
     }
-
     if(response.status===200){
         
         const product = (products) => {
@@ -74,4 +70,68 @@ const purchase = async() => {
             }
         })
     }
+}
+
+function decreaseProd(pid) {
+    const cartId = document.getElementById("cartValue").value;
+    const currentQuantityElement = document.getElementById(`prodQuantity-${pid}`);
+    let currentQuantity = parseInt(currentQuantityElement.innerText);
+    
+    if (currentQuantity > 1) {
+        fetch(`/api/carts/${cartId}/product/${pid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantity: currentQuantity - 1 })
+        })
+        .then(response => response.json())
+        .then(data => {
+            currentQuantityElement.innerText = currentQuantity - 1;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+function increaseProd(pid) {
+    const cartId = document.getElementById("cartValue").value;
+    const currentQuantityElement = document.getElementById(`prodQuantity-${pid}`);
+    let currentQuantity = parseInt(currentQuantityElement.innerText);
+    
+    fetch(`/api/carts/${cartId}/product/${pid}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ quantity: currentQuantity + 1 })
+    })
+    .then(response => response.json())
+    .then(data => {
+        currentQuantityElement.innerText = currentQuantity + 1;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function deleteProd(pid) {
+    const cartId = document.getElementById("cartValue").value;
+
+    fetch(`/api/carts/${cartId}/product/${pid}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        location.reload(); // Reload the page to reflect the changes
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function clearCart(cartId) {
+    fetch(`/api/carts/${cartId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        location.reload(); // Reload the page to reflect the empty cart
+    })
+    .catch(error => console.error('Error:', error));
 }
